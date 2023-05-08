@@ -1,0 +1,8 @@
+namespace Core;
+
+public class Project : BaseEntity
+{
+    public string Title { get; set; }
+    public string Description { get; set; }
+    public List<Task> Tasks { get; set; }
+}
