@@ -93,7 +93,23 @@ namespace DAL
 
         public void Delete(Guid id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var items = GetAllItems();
+                int index = items.FindIndex(item => item.Id.Equals(id));
+            
+                if (index == -1)
+                {
+                    throw new Exception("Object with the specified Id not found.");
+                }
+            
+                items.RemoveAt(index);
+                SaveItems(items);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to delete item. Exception: {ex.Message}");
+            }
         }
 
         private void EnsureFileExists()
