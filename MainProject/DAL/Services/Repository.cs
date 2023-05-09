@@ -57,7 +57,17 @@ namespace DAL
 
         public void Add(T obj)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var items = GetAllItems();
+                items.Add(obj);
+                
+                SaveItems(items);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to add item. Exception: {ex.Message}");
+            }
         }
 
         public void Update(Guid id, T updateObj)
