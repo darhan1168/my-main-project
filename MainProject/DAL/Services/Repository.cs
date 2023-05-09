@@ -44,7 +44,7 @@ namespace DAL
 
                 if (item is null)
                 {
-                    throw new Exception("Item not found");
+                    throw new Exception("Item not found.");
                 }
 
                 return item;
