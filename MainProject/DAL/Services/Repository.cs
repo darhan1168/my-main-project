@@ -33,7 +33,7 @@ namespace DAL
 
         public T GetById(Guid id)
         {
-            throw new NotImplementedException();
+            return GetByPredicate(item => item.Id.Equals(id));
         }
 
         public T GetByPredicate(Func<T, bool> predicate)
