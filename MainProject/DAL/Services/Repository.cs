@@ -72,7 +72,23 @@ namespace DAL
 
         public void Update(Guid id, T updateObj)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var items = GetAllItems();
+                int index = items.FindIndex(item => item.Id.Equals(id));
+
+                if (index == -1)
+                {
+                    throw new Exception("Object with the specified Id not found.")
+                }
+
+                items[index] = updateObj;
+                SaveItems(items);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to update item. Exception: {ex.Message}");
+            }
         }
 
         public void Delete(Guid id)
