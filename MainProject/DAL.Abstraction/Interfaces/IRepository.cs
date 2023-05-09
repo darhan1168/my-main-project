@@ -1,18 +1,19 @@
 using Core;
 
-namespace DAL.Abstraction.Interfaces;
-
-public interface IRepository<T> where T : BaseEntity
+namespace DAL.Abstraction.Interfaces
 {
-    List<T> GetAll(int pageNumber = 1, int pageSize = 10);
+    public interface IRepository<T> where T : BaseEntity
+    {
+        List<T> GetAll(int pageNumber = 1, int pageSize = 10);
 
-    T GetById(Guid id);
+        T GetById(Guid id);
 
-    T GetByPredicate(Func<T, bool> predicate);
+        T GetByPredicate(Func<T, bool> predicate);
 
-    void Add(T obj);
+        void Add(T obj);
 
-    void Update(Guid id, T updateObj);
+        void Update(Guid id, T updateObj);
 
-    void Delete(Guid id);
+        void Delete(Guid id);
+    }
 }
