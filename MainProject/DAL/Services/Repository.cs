@@ -79,7 +79,7 @@ namespace DAL
 
                 if (index == -1)
                 {
-                    throw new Exception("Object with the specified Id not found.")
+                    throw new Exception("Object with the specified Id not found.");
                 }
 
                 items[index] = updateObj;
