@@ -112,5 +112,10 @@ namespace DAL
                 throw new InvalidOperationException($"Failed to write items to the file. Exception: {ex.Message}");
             }
         }
+
+        private void SaveItems(List<T> items)
+        {
+            WriteToFile(items);
+        }
     }
 }
