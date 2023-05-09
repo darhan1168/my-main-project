@@ -15,7 +15,20 @@ namespace DAL
         }
         public List<T> GetAll(int pageNumber = 1, int pageSize = 10)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var items = GetAllItems();
+                var pagedItems = items
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                return pagedItems;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to get all items. Exception: {ex.Message}");
+            }
         }
 
         public T GetById(Guid id)
@@ -48,6 +61,22 @@ namespace DAL
             if (!File.Exists(_filePath))
             {
                 WriteToFile(new List<T>());
+            }
+        }
+
+        private List<T> GetAllItems()
+        {
+            try
+            {
+                using StreamReader file = File.OpenText(_filePath);
+                using JsonTextReader reader = new JsonTextReader(file);
+                JsonSerializer serializer = new JsonSerializer();
+
+                return serializer.Deserialize<List<T>>(reader);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to get items from the file. Exception: {ex.Message}");
             }
         }
 
