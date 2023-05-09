@@ -38,7 +38,21 @@ namespace DAL
 
         public T GetByPredicate(Func<T, bool> predicate)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var item = GetAllItems().FirstOrDefault(predicate);
+
+                if (item is null)
+                {
+                    throw new Exception("Item not found");
+                }
+
+                return item;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to get item. Exception: {ex.Message}");
+            }
         }
 
         public void Add(T obj)
