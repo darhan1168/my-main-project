@@ -4,7 +4,7 @@ using DAL.Abstraction.Interfaces;
 
 namespace BLL;
 
-public class UserService :  GenericService<User> ,IUserService
+public class UserService : GenericService<User>, IUserService
 {
     public UserService(IRepository<User> repository) :
         base(repository)
