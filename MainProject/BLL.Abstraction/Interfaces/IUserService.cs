@@ -6,11 +6,9 @@ public interface IUserService
 {
     void Registration(User user);
 
-    void Authorization(string username, string password);
-    
-    void ResetPassword(Guid userId);
+    User Authorization(string username, string password);
 
-    List<User> GetUserByUsername(string username);
+    User GetUserByUsername(string username);
 
-    List<User> GetUserByEmail(string email);
+    User GetUserByEmail(string email);
 }
