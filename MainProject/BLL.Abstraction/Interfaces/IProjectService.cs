@@ -7,7 +7,11 @@ public interface IProjectService
 {
     void CreateProject(Project project);
 
-    void UpdateProject(Guid projectId);
+    void UpdateTitle(Guid projectId, string newTitle);
+    
+    void UpdateDescription(Guid projectId, string newDescription);
+    
+    void UpdateTasks(Guid projectId, List<Task> newTasks);
 
     void DeleteProject(Guid projectId);
 
