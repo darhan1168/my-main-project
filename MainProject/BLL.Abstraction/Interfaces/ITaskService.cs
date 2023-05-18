@@ -4,7 +4,7 @@ using Task = Core.Task;
 
 namespace BLL.Abstraction.Interfaces;
 
-public interface ITaskService
+public interface ITaskService : IGenericService<Task>
 {
     void CreateTask(Task task);
 

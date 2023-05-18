@@ -3,7 +3,7 @@ using Task = Core.Task;
 
 namespace BLL.Abstraction.Interfaces;
 
-public interface IProjectService
+public interface IProjectService : IGenericService<Project>
 {
     void CreateProject(Project project);
 

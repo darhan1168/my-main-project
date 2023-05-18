@@ -2,7 +2,7 @@ using Core;
 
 namespace BLL.Abstraction.Interfaces;
 
-public interface IUserService
+public interface IUserService : IGenericService<User>
 {
     void Registration(User user);
 
