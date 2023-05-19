@@ -24,7 +24,7 @@ public class UserService : GenericService<User>, IUserService
             {
                 throw new Exception("Email is null");
             }
-
+            
             user.PasswordHash = Core.Helpers.PasswordHashing.HashPassword(user.PasswordHash);
             
             if (user.PasswordHash is null)
