@@ -15,9 +15,7 @@ public interface ITaskService : IGenericService<Task>
     void UpdateDeadline(Guid taskId, DateTime newDeadline);
     
     void UpdateTaskPriority(Guid taskId, TaskPriority newTaskPriority);
-    
-    void UpdateUser(Guid taskId, string newUsername);
-    
+
     void UpdateTaskProgress(Guid taskId, TaskProgress newTaskProgress);
 
     void DeleteTask(Guid taskId);
@@ -25,6 +23,4 @@ public interface ITaskService : IGenericService<Task>
     List<Task> GetAllTasks();
 
     List<Task> GetTasksByTitle(string title);
-
-    List<Task> GetTasksByUser(User user);
 }

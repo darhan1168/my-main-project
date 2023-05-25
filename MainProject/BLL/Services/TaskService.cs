@@ -106,28 +106,6 @@ public class TaskService : GenericService<Task>, ITaskService
         }
     }
 
-    public void UpdateUser(Guid taskId, string newUsername)
-    {
-        try
-        {
-            var task = GetById(taskId);
-            if (task is null)
-            {
-                throw new Exception("Task not found");
-            }
-
-            var newUser = _userService.GetUserByUsername(newUsername);
-            
-
-            task.User = newUser;
-            Update(taskId, task);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Failed to update {newUsername} in task by {taskId}. Exception: {ex.Message}");
-        }
-    }
-
     public void UpdateTaskProgress(Guid taskId, TaskProgress newTaskProgress)
     {
         try
@@ -186,24 +164,6 @@ public class TaskService : GenericService<Task>, ITaskService
         catch (Exception ex)
         {
             throw new Exception($"Failed to get task by {title}. Exception: {ex.Message}");
-        }
-    }
-
-    public List<Task> GetTasksByUser(User user)
-    {
-        try
-        {
-            var tasks = GetAll();
-            if (tasks is null)
-            {
-                throw new Exception("Tasks not found");
-            }
-
-            return tasks.Where(t => t.User.Equals(user)).ToList();
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Failed to get task by {user.Username}. Exception: {ex.Message}");
         }
     }
 }
