@@ -63,6 +63,32 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
             }
         }
     }
+    
+    public void DisplayAllTasks()
+    {
+        try
+        {
+            Console.Clear();
+            var tasks = _service.GetAll().Where(t => t.User.Username.Equals(_user.Username)).ToList();
+            if (tasks.Count == 0)
+            {
+                throw new Exception("Task not added yet");
+            }
+
+            int index = 1;
+            foreach (var task in tasks)
+            {
+                Console.WriteLine($"{index} - Title: {task.Title}, Description: {task.Description}, Deadline: {task.Deadline}, " +
+                                  $"Progress: {task.TaskProgress}, Priority: {task.TaskPriority}");
+                index++;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to display all tasks. Exception: {ex.Message}");
+        }
+    }
+    
     public void CreateTask()
     {
         try
