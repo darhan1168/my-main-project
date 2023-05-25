@@ -63,8 +63,110 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
             }
         }
     }
+    public void CreateTask()
+    {
+        try
+        {
+            Console.Clear();
+            Console.WriteLine("Enter title");
+            Console.Write("Answer:");
+            string title = Console.ReadLine();
+            
+            Console.WriteLine("Enter description");
+            Console.Write("Answer:");
+            string description = Console.ReadLine();
+            
+            Console.Write("Enter the deadline (yyyy-MM-dd HH:mm:ss): ");
+            Console.Write("Answer:");
+            string deadlineInput = Console.ReadLine();
+
+            DateTime deadline;
+            if (!DateTime.TryParse(deadlineInput, out deadline))
+            {
+                throw new Exception("Invalid deadline format. Please enter a valid datetime value.");
+            }
+
+            TaskPriority priority = GetTaskPriority();
+
+            Task task = new Task()
+            {
+                Id = Guid.NewGuid(),
+                Title = title,
+                Description = description,
+                Deadline = deadline,
+                TaskPriority = priority,
+                TaskProgress = TaskProgress.NotStarted,
+                User = _user
+            };
+            _service.CreateTask(task);
+            Console.WriteLine("Your tasks successfully added");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to create task. Exception: {ex.Message}");
+        }
+    }
+    
+    public void AssignTask()
+    {
+        try
+        {
+            
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to create task. Exception: {ex.Message}");
+        }
+    }
+    
+    public void UpdateTask()
+    {
+        try
+        {
+            
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to update task. Exception: {ex.Message}");
+        }
+    }
+    
+    public void DeleteTask()
+    {
+        try
+        {
+            
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to delete task. Exception: {ex.Message}");
+        }
+    }
 
     public void GetUser(Guid userId)
     {
         _user = _userConsoleManager.GetById(userId);
     }
+
+    private TaskPriority GetTaskPriority()
+    {
+        Console.WriteLine("Choose priority");
+        Console.WriteLine("1 - Low");
+        Console.WriteLine("2 - Normal");
+        Console.WriteLine("3 - High");
+        Console.WriteLine("4 - Urgent");
+        Console.WriteLine("5 - Critical");
+        Console.Write("Enter the priority number: ");
+        string input = Console.ReadLine();
+        Dictionary<string, TaskPriority> priorities = new Dictionary<string, TaskPriority>()
+        {
+            { "1", TaskPriority.Low },
+            { "2", TaskPriority.Normal },
+            { "3", TaskPriority.High },
+            { "4", TaskPriority.Urgent },
+            { "5", TaskPriority.Critical }
+        };
+
+        return priorities[input];
+    }
+}
