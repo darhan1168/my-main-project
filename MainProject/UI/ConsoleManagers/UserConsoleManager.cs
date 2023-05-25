@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using BLL;
 using BLL.Abstraction.Interfaces;
 using Core;
+using Core.Enums;
 using UI.Interfaces;
 
 namespace UI.ConsoleManagers;
@@ -86,7 +87,8 @@ public class UserConsoleManager : ConsoleManager<IUserService, User>, IConsoleMa
                 Id = Guid.NewGuid(),
                 Username = username,
                 Email = email,
-                PasswordHash = password
+                PasswordHash = password,
+                Role = GetUserRole()
             });
             Console.WriteLine("You successfully sign up, you need to log in");
         }
@@ -135,5 +137,29 @@ public class UserConsoleManager : ConsoleManager<IUserService, User>, IConsoleMa
     private bool IsCorrectPassword(string password)
     {
         return password.Length >= 6;
+    }
+
+    private UserRole GetUserRole()
+    {
+        try
+        {
+            Dictionary<string, UserRole> roles = new Dictionary<string, UserRole>()
+            {
+                { "1", UserRole.Developer },
+                { "2", UserRole.Tester },
+                { "3", UserRole.Stakeholder }
+            };
+            Console.WriteLine("Choose user role:");
+            Console.WriteLine("1 - Developer (can do project)");
+            Console.WriteLine("2 - Tester (need to test project after developers)");
+            Console.WriteLine("3 - Stakeholder (check project, create tasks)");
+            var input = Console.ReadLine();
+
+            return roles[input];
+        }
+        catch (Exception ex)
+        {
+           throw new Exception($"Failed to get user role. Exception: {ex.Message}");
+        }
     }
 }
