@@ -38,9 +38,11 @@ public class AppManager
                     switch (input)
                     {
                         case "1":
+                            _taskConsoleManager.GetUser(_userConsoleManager.User.Id);
                             _taskConsoleManager.PerformOperations();
                             break;
                         case "2":
+                            _projectConsoleManager.GetUser(_userConsoleManager.User.Id);
                             _projectConsoleManager.PerformOperations();
                             break;
                         case "3":
