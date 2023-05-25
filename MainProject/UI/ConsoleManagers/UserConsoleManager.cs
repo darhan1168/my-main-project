@@ -13,7 +13,9 @@ public class UserConsoleManager : ConsoleManager<IUserService, User>, IConsoleMa
     {
     }
 
-    public bool IsLogIn { get; set; } 
+    public bool IsLogIn { get; set; }
+    
+    public User User { get; set; }
 
     public override void PerformOperations()
     {
@@ -88,7 +90,8 @@ public class UserConsoleManager : ConsoleManager<IUserService, User>, IConsoleMa
                 Username = username,
                 Email = email,
                 PasswordHash = password,
-                Role = GetUserRole()
+                Role = GetUserRole(),
+                Projects = new List<Project>()
             });
             Console.WriteLine("You successfully sign up, you need to log in");
         }
@@ -119,6 +122,7 @@ public class UserConsoleManager : ConsoleManager<IUserService, User>, IConsoleMa
             if (user is not null)
             {
                 IsLogIn = true;
+                User = user;
             }
         }
         catch (Exception ex)
