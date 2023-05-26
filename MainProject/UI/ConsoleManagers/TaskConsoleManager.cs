@@ -9,13 +9,16 @@ namespace UI.ConsoleManagers;
 
 public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleManager<Task>
 {
+    private readonly ProjectConsoleManager _projectConsoleManager;
     private readonly UserConsoleManager _userConsoleManager;
     private User _user;
     
-    public TaskConsoleManager(ITaskService taskService, UserConsoleManager userConsoleManager) 
+    public TaskConsoleManager(ITaskService taskService, UserConsoleManager userConsoleManager, 
+        ProjectConsoleManager projectConsoleManager) 
         : base(taskService)
     {
         _userConsoleManager = userConsoleManager;
+        _projectConsoleManager = projectConsoleManager;
     }
 
     public override void PerformOperations()
@@ -69,7 +72,7 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         try
         {
             Console.Clear();
-            var tasks = _service.GetAll().Where(t => t.User.Username.Equals(_user.Username)).ToList();
+            var tasks = _service.GetAll().Where(t => t.Creator.Username.Equals(_user.Username)).ToList();
             if (tasks.Count == 0)
             {
                 throw new Exception("Task not added yet");
@@ -114,6 +117,8 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
 
             TaskPriority priority = GetTaskPriority();
 
+            var makerRole = _userConsoleManager.GetUserRole();
+
             Task task = new Task()
             {
                 Id = Guid.NewGuid(),
@@ -122,7 +127,8 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
                 Deadline = deadline,
                 TaskPriority = priority,
                 TaskProgress = TaskProgress.NotStarted,
-                User = _user
+                Creator = _user,
+                MakerRole = makerRole
             };
             _service.CreateTask(task);
             Console.WriteLine("Your tasks successfully added");
@@ -137,7 +143,29 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
     {
         try
         {
+            var projects = _projectConsoleManager.GetAll()
+                .Where(p => p.Users.Any(u => u.Username.Equals(_user.Username)))
+                .ToList();
+            if (projects.Count == 0)
+            {
+                throw new Exception("Projects not added yet");
+            }
+
+            //display projects 
+            Console.Write("Choose project");
+            int inputProject = Int32.Parse(Console.ReadLine());
+            var project = projects[inputProject - 1];
             
+            DisplayAllTasks();
+            var tasks = _service.GetAll().Where(t => t.Creator.Username.Equals(_user.Username)).ToList();
+            Console.Write("Choose task to assign");
+            int inputTask = Int32.Parse(Console.ReadLine());
+            var task = tasks[inputTask - 1];
+            
+            project.Tasks.Add(task);
+            task.TaskProgress = TaskProgress.InProgress;
+            _service.Update(task.Id, task);
+            _projectConsoleManager.Update(project.Id, project);
         }
         catch (Exception ex)
         {
@@ -149,7 +177,38 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
     {
         try
         {
-            
+            Console.Clear();
+            DisplayAllTasks();
+            var tasks = _service.GetAll().Where(t => t.Creator.Username.Equals(_user.Username)).ToList();
+            Console.Write("Choose task to update");
+            int inputTask = Int32.Parse(Console.ReadLine());
+            var task = tasks[inputTask - 1];
+            while (true)
+            {
+                Console.WriteLine("\nUpdate operations:");
+                Console.WriteLine("1. Update maker");
+                Console.WriteLine("6. Exit");
+                
+                Console.Write("Enter the operation number: ");
+                string input = Console.ReadLine();
+
+                if (input == "6")
+                {
+                    break;
+                }
+
+                Console.Clear();
+                switch (input)
+                {
+                    case "1":
+                        var makerRole = _userConsoleManager.GetUserRole();
+                        _service.UpdateMaker(task.Id, makerRole);
+                        break;
+                    default:
+                        Console.WriteLine("Invalid operation number."); 
+                        break;
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -161,7 +220,14 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
     {
         try
         {
-            
+            Console.Clear();
+            DisplayAllTasks();
+            var tasks = _service.GetAll().Where(t => t.Creator.Username.Equals(_user.Username)).ToList();
+            Console.Write("Choose task to delete");
+            int inputTask = Int32.Parse(Console.ReadLine());
+            var task = tasks[inputTask - 1];
+            _service.DeleteTask(task.Id);
+            Console.WriteLine("Your tasks successfully delete");
         }
         catch (Exception ex)
         {
@@ -194,5 +260,25 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         };
 
         return priorities[input];
+    }
+
+    private User ChooseMaker()
+    {
+        var developers = _userConsoleManager.GetAll().Where(u => u.Role.Equals(UserRole.Developer)).ToList();
+        if (developers.Count == 1)
+        {
+            throw new Exception("Developers not found");
+        }
+
+        int index = 1;
+        foreach (var developer in developers)
+        {
+            Console.WriteLine($"{index} - Username: {developer.Username}");
+            index++;
+        }
+        
+        Console.Write("Choose task to assign");
+        int input = Int32.Parse(Console.ReadLine());
+        return developers[input - 1];
     }
 }

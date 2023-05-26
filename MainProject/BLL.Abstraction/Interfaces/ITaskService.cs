@@ -18,6 +18,8 @@ public interface ITaskService : IGenericService<Task>
 
     void UpdateTaskProgress(Guid taskId, TaskProgress newTaskProgress);
 
+    void UpdateMaker(Guid taskId, UserRole newUserRole);
+
     void DeleteTask(Guid taskId);
     
     List<Task> GetAllTasks();

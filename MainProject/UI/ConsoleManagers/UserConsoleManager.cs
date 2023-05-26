@@ -143,7 +143,7 @@ public class UserConsoleManager : ConsoleManager<IUserService, User>, IConsoleMa
         return password.Length >= 6;
     }
 
-    private UserRole GetUserRole()
+    public UserRole GetUserRole()
     {
         try
         {
