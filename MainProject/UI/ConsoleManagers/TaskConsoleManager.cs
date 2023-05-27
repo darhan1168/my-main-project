@@ -222,7 +222,10 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
     {
         try
         {
-            
+            Console.Clear();
+            var task = GetTask("delete");
+            _service.DeleteTask(task.Id);
+            Console.WriteLine("Task successfully deleted");
         }
         catch (Exception ex)
         {
