@@ -10,5 +10,5 @@ public class Task : BaseEntity
     public TaskPriority TaskPriority { get; set; }
     public TaskProgress TaskProgress { get; set; }
     public UserRole MakerRole { get; set; }
-    public User Creator { get; set; }
+    public User User { get; set; }
 }
