@@ -142,12 +142,8 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
             Console.Write("Choose project");
             int inputProject = Int32.Parse(Console.ReadLine());
             var project = projects[inputProject - 1];
-            
-            DisplayAllTasks();
-            var tasks = _service.GetAll().Where(t => t.User.Username.Equals(_user.Username)).ToList();
-            Console.Write("Choose task to assign");
-            int inputTask = Int32.Parse(Console.ReadLine());
-            var task = tasks[inputTask - 1];
+
+            var task = GetTask("assign");
             
             project.Tasks.Add(task);
             task.TaskProgress = TaskProgress.InProgress;
@@ -165,11 +161,7 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         try
         {
             Console.Clear();
-            DisplayAllTasks();
-            var tasks = _service.GetAll().Where(t => t.User.Username.Equals(_user.Username)).ToList();
-            Console.Write("Choose task to update:");
-            int inputTask = Int32.Parse(Console.ReadLine());
-            var task = tasks[inputTask - 1];
+            var task = GetTask("update");
             while (true)
             {
                 Console.WriteLine("\nUpdate operations:");
@@ -277,6 +269,15 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         };
 
         return priorities[input];
+    }
+
+    private Task GetTask(string cause)
+    {
+        DisplayAllTasks();
+        var tasks = _service.GetAll().Where(t => t.User.Username.Equals(_user.Username)).ToList();
+        Console.Write($"Choose task to {cause}:");
+        int inputTask = Int32.Parse(Console.ReadLine());
+        return tasks[inputTask - 1];
     }
 
     private User ChooseMaker()
