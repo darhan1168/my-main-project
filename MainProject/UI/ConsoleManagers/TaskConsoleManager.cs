@@ -13,8 +13,7 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
     private readonly UserConsoleManager _userConsoleManager;
     private User _user;
     
-    public TaskConsoleManager(ITaskService taskService, UserConsoleManager userConsoleManager, 
-        ProjectConsoleManager projectConsoleManager) 
+    public TaskConsoleManager(ITaskService taskService, UserConsoleManager userConsoleManager, ProjectConsoleManager projectConsoleManager) 
         : base(taskService)
     {
         _userConsoleManager = userConsoleManager;
@@ -72,7 +71,7 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         try
         {
             Console.Clear();
-            var tasks = _service.GetAll().Where(t => t.Creator.Username.Equals(_user.Username)).ToList();
+            var tasks = _service.GetAll().Where(t => t.User.Username.Equals(_user.Username)).ToList();
             if (tasks.Count == 0)
             {
                 throw new Exception("Task not added yet");
@@ -97,27 +96,15 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         try
         {
             Console.Clear();
-            Console.WriteLine("Enter title");
-            Console.Write("Answer:");
+            Console.Write("Enter title:");
             string title = Console.ReadLine();
             
-            Console.WriteLine("Enter description");
-            Console.Write("Answer:");
+            Console.Write("Enter description");
             string description = Console.ReadLine();
-            
-            Console.Write("Enter the deadline (yyyy-MM-dd HH:mm:ss): ");
-            Console.Write("Answer:");
-            string deadlineInput = Console.ReadLine();
-
-            DateTime deadline;
-            if (!DateTime.TryParse(deadlineInput, out deadline))
-            {
-                throw new Exception("Invalid deadline format. Please enter a valid datetime value.");
-            }
+         
+            var deadline = GetDeadline();
 
             TaskPriority priority = GetTaskPriority();
-
-            var makerRole = _userConsoleManager.GetUserRole();
 
             Task task = new Task()
             {
@@ -127,8 +114,8 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
                 Deadline = deadline,
                 TaskPriority = priority,
                 TaskProgress = TaskProgress.NotStarted,
-                Creator = _user,
-                MakerRole = makerRole
+                User = _user,
+                MakerRole = UserRole.Developer
             };
             _service.CreateTask(task);
             Console.WriteLine("Your tasks successfully added");
@@ -157,7 +144,7 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
             var project = projects[inputProject - 1];
             
             DisplayAllTasks();
-            var tasks = _service.GetAll().Where(t => t.Creator.Username.Equals(_user.Username)).ToList();
+            var tasks = _service.GetAll().Where(t => t.User.Username.Equals(_user.Username)).ToList();
             Console.Write("Choose task to assign");
             int inputTask = Int32.Parse(Console.ReadLine());
             var task = tasks[inputTask - 1];
@@ -179,24 +166,28 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         {
             Console.Clear();
             DisplayAllTasks();
-            var tasks = _service.GetAll().Where(t => t.Creator.Username.Equals(_user.Username)).ToList();
-            Console.Write("Choose task to update");
+            var tasks = _service.GetAll().Where(t => t.User.Username.Equals(_user.Username)).ToList();
+            Console.Write("Choose task to update:");
             int inputTask = Int32.Parse(Console.ReadLine());
             var task = tasks[inputTask - 1];
             while (true)
             {
                 Console.WriteLine("\nUpdate operations:");
                 Console.WriteLine("1. Update maker");
+                Console.WriteLine("2. Update title");
+                Console.WriteLine("3. Update description");
+                Console.WriteLine("4. Update deadline");
+                Console.WriteLine("5. Update task priority");
                 Console.WriteLine("6. Exit");
                 
                 Console.Write("Enter the operation number: ");
                 string input = Console.ReadLine();
-
+            
                 if (input == "6")
                 {
                     break;
                 }
-
+            
                 Console.Clear();
                 switch (input)
                 {
@@ -204,10 +195,29 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
                         var makerRole = _userConsoleManager.GetUserRole();
                         _service.UpdateMaker(task.Id, makerRole);
                         break;
+                    case "2":
+                        Console.Write("Enter new title:");
+                        string title = Console.ReadLine();
+                        _service.UpdateTitle(task.Id, title);
+                        break;
+                    case "3":
+                        Console.Write("Enter new description");
+                        string description = Console.ReadLine();
+                        _service.UpdateDescription(task.Id, description);
+                        break;
+                    case "4":
+                        var deadline = GetDeadline();
+                        _service.UpdateDeadline(task.Id, deadline);
+                        break;
+                    case "5":
+                        TaskPriority priority = GetTaskPriority();
+                        _service.UpdateTaskPriority(task.Id, priority);
+                        break;
                     default:
                         Console.WriteLine("Invalid operation number."); 
                         break;
                 }
+                Console.WriteLine("Task successfully updated");
             }
         }
         catch (Exception ex)
@@ -220,14 +230,7 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
     {
         try
         {
-            Console.Clear();
-            DisplayAllTasks();
-            var tasks = _service.GetAll().Where(t => t.Creator.Username.Equals(_user.Username)).ToList();
-            Console.Write("Choose task to delete");
-            int inputTask = Int32.Parse(Console.ReadLine());
-            var task = tasks[inputTask - 1];
-            _service.DeleteTask(task.Id);
-            Console.WriteLine("Your tasks successfully delete");
+            
         }
         catch (Exception ex)
         {
@@ -238,6 +241,20 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
     public void GetUser(Guid userId)
     {
         _user = _userConsoleManager.GetById(userId);
+    }
+
+    private DateTime GetDeadline()
+    {
+        Console.Write("Enter the deadline (yyyy-MM-dd HH:mm:ss): ");
+        string deadlineInput = Console.ReadLine();
+
+        DateTime deadline;
+        if (!DateTime.TryParse(deadlineInput, out deadline))
+        {
+            throw new Exception("Invalid deadline format. Please enter a valid datetime value.");
+        }
+
+        return deadline;
     }
 
     private TaskPriority GetTaskPriority()
