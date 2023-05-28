@@ -124,7 +124,7 @@ public class TaskService : GenericService<Task>, ITaskService
             throw new Exception($"Failed to update {newTaskProgress} in task by {taskId}. Exception: {ex.Message}");
         }
     }
-
+    
     public void UpdateMaker(Guid taskId, UserRole newUserRole)
     {
         try
@@ -150,7 +150,7 @@ public class TaskService : GenericService<Task>, ITaskService
             throw new Exception($"Failed to update {newUserRole} in task by {taskId}. Exception: {ex.Message}");
         }
     }
-
+    
     public void DeleteTask(Guid taskId)
     {
         try
