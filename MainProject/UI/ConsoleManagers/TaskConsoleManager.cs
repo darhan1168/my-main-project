@@ -1,3 +1,4 @@
+using System.Net;
 using BLL;
 using BLL.Abstraction.Interfaces;
 using Core;
@@ -9,15 +10,13 @@ namespace UI.ConsoleManagers;
 
 public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleManager<Task>
 {
-    private readonly ProjectConsoleManager _projectConsoleManager;
     private readonly UserConsoleManager _userConsoleManager;
     private User _user;
     
-    public TaskConsoleManager(ITaskService taskService, UserConsoleManager userConsoleManager, ProjectConsoleManager projectConsoleManager) 
+    public TaskConsoleManager(ITaskService taskService, UserConsoleManager userConsoleManager) 
         : base(taskService)
     {
         _userConsoleManager = userConsoleManager;
-        _projectConsoleManager = projectConsoleManager;
     }
 
     public override void PerformOperations()
@@ -26,27 +25,25 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         {
             { "1", DisplayAllTasks },
             { "2", CreateTask },
-            { "3", WorkWithTask },
-            { "4", UpdateTask },
-            { "5", CheckTask },
-            { "6", DeleteTask }
+            { "3", UpdateTask },
+            { "4", CheckTask },
+            { "5", DeleteTask }
         };
 
         while (true)
         {
             Console.WriteLine("\nUser operations:");
             Console.WriteLine("1. Display all your tasks");
-            Console.WriteLine("2. Create a new task"); //s
-            Console.WriteLine("3. Work with a task");
-            Console.WriteLine("4. Update a task"); //s
-            Console.WriteLine("5. Check a task"); //
-            Console.WriteLine("6. Delete a task"); //s
-            Console.WriteLine("7. Exit");
+            Console.WriteLine("2. Create a new task");
+            Console.WriteLine("3. Update a task"); 
+            Console.WriteLine("4. Check a task"); 
+            Console.WriteLine("5. Delete a task"); 
+            Console.WriteLine("6. Exit");
 
             Console.Write("Enter the operation number: ");
             string input = Console.ReadLine();
 
-            if (input == "7")
+            if (input == "6")
             {
                 break;
             }
@@ -67,7 +64,8 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         try
         {
             Console.Clear();
-            var tasks = _service.GetAll().Where(t => t.User.Username.Equals(_user.Username)).ToList();
+            var tasks = _service.GetAll().Where(t => t.Creator.Username.Equals(_user.Username) 
+                                                     || t.ResponsibleUser.Username.Equals(_user.Username)).ToList();
             if (tasks.Count == 0)
             {
                 throw new Exception("Task not added yet");
@@ -77,7 +75,7 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
             foreach (var task in tasks)
             {
                 Console.WriteLine($"{index} - Title: {task.Title}, Description: {task.Description}, Deadline: {task.Deadline}, " +
-                                  $"Progress: {task.TaskProgress}, Priority: {task.TaskPriority}");
+                                  $"Progress: {task.TaskProgress}, Priority: {task.TaskPriority}, Files in task: {task.Files.Count}");
                 index++;
             }
         }
@@ -91,16 +89,18 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
     {
         try
         {
+            IsSteakHolder("create");
             Console.Clear();
             Console.Write("Enter title:");
             string title = Console.ReadLine();
             
-            Console.Write("Enter description");
+            Console.Write("Enter description:");
             string description = Console.ReadLine();
          
             var deadline = GetDeadline();
-
             TaskPriority priority = GetTaskPriority();
+            User responsibleUser = ChooseResponsible();
+            var files = GetFiles();
 
             Task task = new Task()
             {
@@ -110,8 +110,9 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
                 Deadline = deadline,
                 TaskPriority = priority,
                 TaskProgress = TaskProgress.NotStarted,
-                User = _user,
-                MakerRole = UserRole.Developer
+                Creator = _user,
+                ResponsibleUser = responsibleUser,
+                Files = files
             };
             _service.CreateTask(task);
             Console.WriteLine("Your tasks successfully added");
@@ -121,51 +122,22 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
             Console.WriteLine($"Failed to create task. Exception: {ex.Message}");
         }
     }
-    
-    public void AssignTask()
-    {
-        try
-        {
-            var projects = _projectConsoleManager.GetAll()
-                .Where(p => p.Users.Any(u => u.Username.Equals(_user.Username)))
-                .ToList();
-            if (projects.Count == 0)
-            {
-                throw new Exception("Projects not added yet");
-            }
 
-            //display projects 
-            Console.Write("Choose project");
-            int inputProject = Int32.Parse(Console.ReadLine());
-            var project = projects[inputProject - 1];
-
-            var task = GetTask("assign");
-            
-            project.Tasks.Add(task);
-            task.TaskProgress = TaskProgress.InProgress;
-            _service.Update(task.Id, task);
-            _projectConsoleManager.Update(project.Id, project);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Failed to create task. Exception: {ex.Message}");
-        }
-    }
-    
     public void UpdateTask()
     {
         try
         {
+            IsSteakHolder("update");
             Console.Clear();
             var task = GetTask("update");
             while (true)
             {
                 Console.WriteLine("\nUpdate operations:");
-                Console.WriteLine("1. Update maker");
-                Console.WriteLine("2. Update title");
-                Console.WriteLine("3. Update description");
-                Console.WriteLine("4. Update deadline");
-                Console.WriteLine("5. Update task priority");
+                Console.WriteLine("1. Update title");
+                Console.WriteLine("2. Update description");
+                Console.WriteLine("3. Update deadline");
+                Console.WriteLine("4. Update task priority");
+                Console.WriteLine("5. Add files");
                 Console.WriteLine("6. Exit");
                 
                 Console.Write("Enter the operation number: ");
@@ -180,26 +152,26 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
                 switch (input)
                 {
                     case "1":
-                        var makerRole = _userConsoleManager.GetUserRole();
-                        _service.UpdateMaker(task.Id, makerRole);
-                        break;
-                    case "2":
                         Console.Write("Enter new title:");
                         string title = Console.ReadLine();
                         _service.UpdateTitle(task.Id, title);
                         break;
-                    case "3":
+                    case "2":
                         Console.Write("Enter new description");
                         string description = Console.ReadLine();
                         _service.UpdateDescription(task.Id, description);
                         break;
-                    case "4":
+                    case "3":
                         var deadline = GetDeadline();
                         _service.UpdateDeadline(task.Id, deadline);
                         break;
-                    case "5":
+                    case "4":
                         TaskPriority priority = GetTaskPriority();
                         _service.UpdateTaskPriority(task.Id, priority);
+                        break;
+                    case "5":
+                        task.Files.Add(GetFile());
+                        _service.Update(task.Id, task);
                         break;
                     default:
                         Console.WriteLine("Invalid operation number."); 
@@ -227,6 +199,14 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
                 TransitionNewStep("checked", task);
                 Console.WriteLine("Task successfully checked and wait to test");
             }
+            else if ((task.TaskProgress.Equals(TaskProgress.InProgress)
+                     && task.ResponsibleUser.Username.Equals(_user.Username)
+                     && _user.Role.Equals(UserRole.Developer))
+                     || _user.Role.Equals(UserRole.Tester)
+                     || _user.Role.Equals(UserRole.Stakeholder))
+            {
+                Console.WriteLine("Task must check another developer");
+            }
 
             if (task.TaskProgress.Equals(TaskProgress.Tested)
                 && _user.Role.Equals(UserRole.Tester))
@@ -234,12 +214,22 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
                 TransitionNewStep("tested", task);
                 Console.WriteLine("Task successfully tested and wait to pending approval");
             }
+            else if (task.TaskProgress.Equals(TaskProgress.Tested)
+                     && !_user.Role.Equals(UserRole.Tester))
+            {
+                Console.WriteLine("Task must tested just tester");
+            }
             
             if (task.TaskProgress.Equals(TaskProgress.PendingApproval)
                 && _user.Role.Equals(UserRole.Stakeholder))
             {
                 TransitionNewStep("done", task);
-                Console.WriteLine("Task successfully complited");
+                Console.WriteLine("Task successfully completed");
+            }
+            else if (task.TaskProgress.Equals(TaskProgress.PendingApproval)
+                     && !_user.Role.Equals(UserRole.Stakeholder))
+            {
+                Console.WriteLine("Task must completed just by stakeholder");
             }
         }
         catch (Exception ex)
@@ -252,6 +242,7 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
     {
         try
         {
+            IsSteakHolder("delete");
             Console.Clear();
             var task = GetTask("delete");
             _service.DeleteTask(task.Id);
@@ -304,16 +295,17 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         return priorities[input];
     }
 
-    private Task GetTask(string cause)
+    public Task GetTask(string cause)
     {
         DisplayAllTasks();
-        var tasks = _service.GetAll().Where(t => t.User.Username.Equals(_user.Username)).ToList();
+        var tasks = _service.GetAll().Where(t => t.Creator.Username.Equals(_user.Username) 
+                                                 || t.ResponsibleUser.Username.Equals(_user.Username)).ToList();
         Console.Write($"Choose task to {cause}:");
         int inputTask = Int32.Parse(Console.ReadLine());
         return tasks[inputTask - 1];
     }
-
-    private User ChooseMaker()
+    
+    private User ChooseResponsible()
     {
         var developers = _userConsoleManager.GetAll().Where(u => u.Role.Equals(UserRole.Developer)).ToList();
         if (developers.Count == 1)
@@ -328,10 +320,73 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
             index++;
         }
         
-        Console.Write("Choose task to assign");
+        Console.Write("Choose developer to assign:");
         int input = Int32.Parse(Console.ReadLine());
         return developers[input - 1];
     }
+
+    private List<TaskFile> GetFiles()
+    {
+        List<TaskFile> files = new List<TaskFile>();
+        Console.WriteLine("Enter 1 if you want to add files in task");
+        string answer = Console.ReadLine();
+        if (answer != "1")
+        {
+            return files;
+        }
+        
+        while (true)
+        {
+            files.Add(GetFile());
+            Console.WriteLine("File successfully added");
+            Console.WriteLine("Enter 1 if you want to add more");
+            string input = Console.ReadLine();
+            if (input != "1")
+            {
+                return files;
+            }
+        }
+    }
+
+    private TaskFile GetFile()
+    {
+        while (true)
+        {
+            Console.Write("Enter file path:");
+            string path = Console.ReadLine();
+            
+            Console.Write("Enter file name:");
+            string name = Console.ReadLine();
+            
+            string fullPath = Path.Combine(path, name);
+            if (File.Exists(fullPath))
+            {
+                var file = new TaskFile()
+                {
+                    Id = Guid.NewGuid(),
+                    FilePath = path,
+                    FileName = name,
+                    CreatedBy = _user,
+                    CreationDate = DateTime.Today
+                };
+
+                return file;
+            }
+            else
+            {
+                Console.WriteLine("This file doesn't look for");
+            }
+        }
+    }
+
+    private void IsSteakHolder(string reason)
+    {
+        if (!_user.Role.Equals(UserRole.Stakeholder))
+        {
+           throw new Exception($"Only stakeholder can {reason} tasks");
+        }
+    }
+
     private void TransitionNewStep(string action, Task task)
     {
         Console.WriteLine($"Enter 1 if you already {action} task and it is correct");
