@@ -150,7 +150,31 @@ public class TaskService : GenericService<Task>, ITaskService
             throw new Exception($"Failed to update {newUserRole} in task by {taskId}. Exception: {ex.Message}");
         }
     }
-    
+
+    public void TransitionNewStep(Guid taskId)
+    {
+        var task = GetById(taskId);
+        if (task.TaskProgress.Equals(TaskProgress.InProgress))
+        {
+            task.TaskProgress = TaskProgress.Tested;
+        }
+        else if (task.TaskProgress.Equals(TaskProgress.Tested))
+        {
+            task.TaskProgress = TaskProgress.PendingApproval;
+        }
+        else if (task.TaskProgress.Equals(TaskProgress.PendingApproval))
+        {
+            task.TaskProgress = TaskProgress.Completed;
+        }
+        
+        Update(taskId, task);
+    }
+
+    public void CheckTask()
+    {
+        throw new NotImplementedException();
+    }
+
     public void DeleteTask(Guid taskId)
     {
         try

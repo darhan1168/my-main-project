@@ -20,6 +20,8 @@ public interface ITaskService : IGenericService<Task>
 
     void UpdateMaker(Guid taskId, UserRole newUserRole);
 
+    void TransitionNewStep(Guid taskId);
+
     void DeleteTask(Guid taskId);
     
     List<Task> GetAllTasks();

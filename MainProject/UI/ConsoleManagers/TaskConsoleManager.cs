@@ -26,31 +26,27 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         {
             { "1", DisplayAllTasks },
             { "2", CreateTask },
-            { "3", AssignTask },
+            { "3", WorkWithTask },
             { "4", UpdateTask },
-            { "5", DeleteTask },
+            { "5", CheckTask },
+            { "6", DeleteTask }
         };
 
         while (true)
         {
-            if (!_user.Role.Equals(UserRole.Stakeholder))
-            {
-                Console.WriteLine("Only stakeholder can create and work with tasks");
-                break;
-            }
-            
             Console.WriteLine("\nUser operations:");
             Console.WriteLine("1. Display all your tasks");
-            Console.WriteLine("2. Create a new task");
-            Console.WriteLine("3. Assign a task");
-            Console.WriteLine("4. Update a task");
-            Console.WriteLine("5. Delete a task");
-            Console.WriteLine("6. Exit");
+            Console.WriteLine("2. Create a new task"); //s
+            Console.WriteLine("3. Work with a task");
+            Console.WriteLine("4. Update a task"); //s
+            Console.WriteLine("5. Check a task"); //
+            Console.WriteLine("6. Delete a task"); //s
+            Console.WriteLine("7. Exit");
 
             Console.Write("Enter the operation number: ");
             string input = Console.ReadLine();
 
-            if (input == "6")
+            if (input == "7")
             {
                 break;
             }
@@ -217,6 +213,40 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
             Console.WriteLine($"Failed to update task. Exception: {ex.Message}");
         }
     }
+
+    public void CheckTask()
+    {
+        try
+        {
+            Console.Clear();
+            var task = GetTask("check");
+            if (task.TaskProgress.Equals(TaskProgress.InProgress)
+                && !task.ResponsibleUser.Username.Equals(_user.Username)
+                && _user.Role.Equals(UserRole.Developer))
+            {
+                TransitionNewStep("checked", task);
+                Console.WriteLine("Task successfully checked and wait to test");
+            }
+
+            if (task.TaskProgress.Equals(TaskProgress.Tested)
+                && _user.Role.Equals(UserRole.Tester))
+            {
+                TransitionNewStep("tested", task);
+                Console.WriteLine("Task successfully tested and wait to pending approval");
+            }
+            
+            if (task.TaskProgress.Equals(TaskProgress.PendingApproval)
+                && _user.Role.Equals(UserRole.Stakeholder))
+            {
+                TransitionNewStep("done", task);
+                Console.WriteLine("Task successfully complited");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to check task. Exception: {ex.Message}");
+        }
+    }
     
     public void DeleteTask()
     {
@@ -301,5 +331,18 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         Console.Write("Choose task to assign");
         int input = Int32.Parse(Console.ReadLine());
         return developers[input - 1];
+    }
+    private void TransitionNewStep(string action, Task task)
+    {
+        Console.WriteLine($"Enter 1 if you already {action} task and it is correct");
+        string input = Console.ReadLine();
+        if (input == "1")
+        {
+            _service.TransitionNewStep(task.Id);
+        }
+        else
+        {
+            return;
+        }
     }
 }
