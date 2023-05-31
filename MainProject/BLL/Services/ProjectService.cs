@@ -1,5 +1,6 @@
 using BLL.Abstraction.Interfaces;
 using Core;
+using Core.Enums;
 using DAL.Abstraction.Interfaces;
 using Task = Core.Task;
 
@@ -90,6 +91,25 @@ public class ProjectService : GenericService<Project>, IProjectService
         catch (Exception ex)
         {
             throw new Exception($"Failed to delete project by {projectId}. Exception: {ex.Message}");
+        }
+    }
+
+    public double GetCompletionRate(Guid projectId)
+    {
+        try
+        {
+            var project = GetById(projectId);
+            int completedTasksCount = project.Tasks.Count(t => t.TaskProgress.Equals(TaskProgress.Completed));
+            int totalTasksCount = project.Tasks.Count;
+            double completionPercentage = (completedTasksCount / (double)totalTasksCount) * 100;
+            
+            project.CompletionRate = completionPercentage;
+            Update(projectId, project);
+            return completionPercentage;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get completion rate. Exception: {ex.Message}");
         }
     }
 

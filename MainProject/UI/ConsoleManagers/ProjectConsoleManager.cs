@@ -1,6 +1,8 @@
 using BLL.Abstraction.Interfaces;
 using Core;
+using Core.Enums;
 using UI.Interfaces;
+using Task = Core.Task;
 
 namespace UI.ConsoleManagers;
 
@@ -10,7 +12,8 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
     private readonly UserConsoleManager _userConsoleManager;
     private User _user;
     
-    public ProjectConsoleManager(IProjectService projectService, UserConsoleManager userConsoleManager, TaskConsoleManager taskConsoleManager) 
+    public ProjectConsoleManager(IProjectService projectService, UserConsoleManager userConsoleManager, 
+        TaskConsoleManager taskConsoleManager) 
         : base(projectService)
     {
         _userConsoleManager = userConsoleManager;
@@ -25,6 +28,7 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
             { "2", CreateProject },
             { "3", UpdateProject },
             { "4", DeleteProject },
+            { "5", Task },
         };
 
         while (true)
@@ -34,12 +38,13 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
             Console.WriteLine("2. Create a new project"); //steak
             Console.WriteLine("3. Update a project"); //all
             Console.WriteLine("4. Delete a project"); //steak
-            Console.WriteLine("5. Exit");
+            Console.WriteLine("5. Work with my task");
+            Console.WriteLine("6. Exit");
 
             Console.Write("Enter the operation number: ");
             string input = Console.ReadLine();
 
-            if (input == "5")
+            if (input == "6")
             {
                 break;
             }
@@ -65,9 +70,13 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
             int index = 1;
             foreach (var project in projects)
             {
-                Console.WriteLine($"{index} - Title: {project.Title}, Description: {project.Description}");
+                var completionRate = _service.GetCompletionRate(project.Id);
+                Console.WriteLine($"{index} - Title: {project.Title}, Description: {project.Description}, Completion rate: {completionRate} %");
+                
                 Console.WriteLine("Tasks:");
                 DisplayAllTask(project);
+                
+                Console.WriteLine("Makers:");
                 DisplayAllMakers(project);
                 index++;
             }
