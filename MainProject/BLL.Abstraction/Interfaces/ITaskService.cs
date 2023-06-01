@@ -18,8 +18,6 @@ public interface ITaskService : IGenericService<Task>
 
     void UpdateTaskProgress(Guid taskId, TaskProgress newTaskProgress);
 
-    void UpdateMaker(Guid taskId, UserRole newUserRole);
-
     void TransitionNewStep(Guid taskId);
 
     void DeleteTask(Guid taskId);
