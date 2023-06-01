@@ -12,8 +12,12 @@ public interface IProjectService : IGenericService<Project>
     void UpdateDescription(Guid projectId, string newDescription);
     
     void UpdateTasks(Guid projectId, List<Task> newTasks);
+    
+    void UpdateUsers(Guid projectId, List<User> newUsers);
 
     void DeleteProject(Guid projectId);
+
+    double GetCompletionRate(Guid projectId);
 
     List<Project> GetAllProjects();
     
