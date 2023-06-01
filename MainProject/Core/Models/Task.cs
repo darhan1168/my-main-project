@@ -9,8 +9,6 @@ public class Task : BaseEntity
     public DateTime Deadline { get; set; }
     public TaskPriority TaskPriority { get; set; }
     public TaskProgress TaskProgress { get; set; }
-    public UserRole MakerRole { get; set; }
-    public User User { get; set; }
     public User ResponsibleUser { get; set; }
     public User Creator { get; set; }
     public List<TaskFile> Files { get; set; }
