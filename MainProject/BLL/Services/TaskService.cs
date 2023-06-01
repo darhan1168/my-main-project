@@ -124,32 +124,6 @@ public class TaskService : GenericService<Task>, ITaskService
             throw new Exception($"Failed to update {newTaskProgress} in task by {taskId}. Exception: {ex.Message}");
         }
     }
-    
-    public void UpdateMaker(Guid taskId, UserRole newUserRole)
-    {
-        try
-        {
-            var task = GetById(taskId);
-            if (task is null)
-            {
-                throw new Exception("Task not found");
-            }
-
-            Dictionary<UserRole, TaskProgress> progresses = new Dictionary<UserRole, TaskProgress>()
-            {
-                { UserRole.Developer, TaskProgress.InProgress },
-                { UserRole.Tester, TaskProgress.Tested },
-                { UserRole.Stakeholder, TaskProgress.Completed }
-            };
-            task.TaskProgress = progresses[newUserRole];
-            task.MakerRole = newUserRole;
-            Update(taskId, task);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Failed to update {newUserRole} in task by {taskId}. Exception: {ex.Message}");
-        }
-    }
 
     public void TransitionNewStep(Guid taskId)
     {
