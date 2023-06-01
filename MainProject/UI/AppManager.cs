@@ -1,3 +1,4 @@
+using Core.Enums;
 using UI.ConsoleManagers;
 
 namespace UI;
@@ -7,6 +8,7 @@ public class AppManager
     private readonly ProjectConsoleManager _projectConsoleManager;
     private readonly TaskConsoleManager _taskConsoleManager;
     private readonly UserConsoleManager _userConsoleManager;
+    //private readonly TaskFileConsoleManager _fileConsoleManager;
 
     public AppManager(ProjectConsoleManager projectConsoleManager,
         TaskConsoleManager taskConsoleManager,
@@ -15,6 +17,7 @@ public class AppManager
         _projectConsoleManager = projectConsoleManager;
         _taskConsoleManager = taskConsoleManager;
         _userConsoleManager = userConsoleManager;
+        //_fileConsoleManager = fileConsoleManager;
     }
 
     public void Start()
@@ -25,12 +28,15 @@ public class AppManager
         
             while (true)
             {
-                if (_userConsoleManager.IsLogIn)
+                if (_userConsoleManager.IsLogIn && _userConsoleManager.User.Role.Equals(UserRole.Stakeholder))
                 {
+                    _taskConsoleManager.GetUser(_userConsoleManager.User.Id);
+                    _projectConsoleManager.GetUser(_userConsoleManager.User.Id);
+                    
                     Console.WriteLine("\nChoose an operation:");
                     Console.WriteLine("1. Task operations");
                     Console.WriteLine("2. Project operations");
-                    Console.WriteLine("3. Exit");
+                    Console.WriteLine("4. Exit");
                 
                     Console.Write("Enter the operation number: ");
                     string input = Console.ReadLine();
@@ -38,14 +44,33 @@ public class AppManager
                     switch (input)
                     {
                         case "1":
-                            _taskConsoleManager.GetUser(_userConsoleManager.User.Id);
                             _taskConsoleManager.PerformOperations();
                             break;
                         case "2":
+                            _projectConsoleManager.PerformOperations();
+                            break;
+                        case "4":
+                            return;
+                        default:
+                            Console.WriteLine("Invalid operation number.");
+                            break;
+                    }
+                }
+                else if (_userConsoleManager.IsLogIn)
+                {
+                    Console.WriteLine("1. Project operations");
+                    Console.WriteLine("2. Exit");
+                
+                    Console.Write("Enter the operation number: ");
+                    string input = Console.ReadLine();
+                
+                    switch (input)
+                    {
+                        case "1":
                             _projectConsoleManager.GetUser(_userConsoleManager.User.Id);
                             _projectConsoleManager.PerformOperations();
                             break;
-                        case "3":
+                        case "2":
                             return;
                         default:
                             Console.WriteLine("Invalid operation number.");
