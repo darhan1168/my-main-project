@@ -12,6 +12,7 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
 {
     private readonly UserConsoleManager _userConsoleManager;
     private User _user;
+    private Project _project;
     
     public TaskConsoleManager(ITaskService taskService, UserConsoleManager userConsoleManager) 
         : base(taskService)
@@ -66,6 +67,14 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
             Console.Clear();
             var tasks = _service.GetAll().Where(t => t.Creator.Username.Equals(_user.Username) 
                                                      || t.ResponsibleUser.Username.Equals(_user.Username)).ToList();
+            if (tasks.Count == 0)
+            {
+                foreach (var task in _project.Tasks)
+                {
+                    tasks.Add(_service.GetByPredicate(t => t.Id.Equals(task.Id)));
+                }
+            }
+            
             if (tasks.Count == 0)
             {
                 throw new Exception("Task not added yet");
@@ -258,6 +267,11 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
     {
         _user = _userConsoleManager.GetById(userId);
     }
+    
+    public void GetProject(Project project)
+    {
+        _project = project;
+    }
 
     private DateTime GetDeadline()
     {
@@ -300,6 +314,14 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         DisplayAllTasks();
         var tasks = _service.GetAll().Where(t => t.Creator.Username.Equals(_user.Username) 
                                                  || t.ResponsibleUser.Username.Equals(_user.Username)).ToList();
+        if (tasks.Count == 0)
+        {
+            foreach (var task in _project.Tasks)
+            {
+                tasks.Add(_service.GetByPredicate(t => t.Id.Equals(task.Id)));
+            }
+        }
+        
         Console.Write($"Choose task to {cause}:");
         int inputTask = Int32.Parse(Console.ReadLine());
         return tasks[inputTask - 1];
