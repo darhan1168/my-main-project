@@ -8,7 +8,6 @@ public class AppManager
     private readonly ProjectConsoleManager _projectConsoleManager;
     private readonly TaskConsoleManager _taskConsoleManager;
     private readonly UserConsoleManager _userConsoleManager;
-    //private readonly TaskFileConsoleManager _fileConsoleManager;
 
     public AppManager(ProjectConsoleManager projectConsoleManager,
         TaskConsoleManager taskConsoleManager,
@@ -17,7 +16,6 @@ public class AppManager
         _projectConsoleManager = projectConsoleManager;
         _taskConsoleManager = taskConsoleManager;
         _userConsoleManager = userConsoleManager;
-        //_fileConsoleManager = fileConsoleManager;
     }
 
     public void Start()
@@ -36,7 +34,7 @@ public class AppManager
                     Console.WriteLine("\nChoose an operation:");
                     Console.WriteLine("1. Task operations");
                     Console.WriteLine("2. Project operations");
-                    Console.WriteLine("4. Exit");
+                    Console.WriteLine("3. Exit");
                 
                     Console.Write("Enter the operation number: ");
                     string input = Console.ReadLine();
@@ -49,7 +47,7 @@ public class AppManager
                         case "2":
                             _projectConsoleManager.PerformOperations();
                             break;
-                        case "4":
+                        case "3":
                             return;
                         default:
                             Console.WriteLine("Invalid operation number.");
