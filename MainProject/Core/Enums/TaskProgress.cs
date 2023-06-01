@@ -6,8 +6,5 @@ public enum TaskProgress
     InProgress,
     Tested,
     PendingApproval,
-    Completed,
-    Failed,
-    Canceled,
-    Paused
+    Completed
 }
