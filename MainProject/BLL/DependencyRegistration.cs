@@ -10,7 +10,7 @@ public class DependencyRegistration
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ITaskService, TaskService>();
         services.AddScoped<IProjectService, ProjectService>();
-        
+
         DAL.DependencyRegistration.RegisterRepositories(services);
     }
 }
