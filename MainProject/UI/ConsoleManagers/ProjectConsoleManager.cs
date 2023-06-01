@@ -70,8 +70,9 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
             int index = 1;
             foreach (var project in projects)
             {
+                Console.WriteLine("-----");
                 var completionRate = _service.GetCompletionRate(project.Id);
-                Console.WriteLine($"{index} - Title: {project.Title}, Description: {project.Description}, Completion rate: {completionRate} %");
+                Console.WriteLine($"{index} Project - Title: {project.Title}, Description: {project.Description}, Completion rate: {completionRate} %");
                 
                 Console.WriteLine("Tasks:");
                 DisplayAllTask(project);
@@ -91,12 +92,7 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
     {
         try
         {
-            if (!_user.Role.Equals(UserRole.Stakeholder))
-            {
-                Console.WriteLine("Only stakeholder can create project");
-                return;
-            }
-            
+            IsSteakHolder("create");
             Console.Clear();
             Console.Write("Enter title:");
             string title = Console.ReadLine();
@@ -127,12 +123,7 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
     {
         try
         {
-            if (!_user.Role.Equals(UserRole.Stakeholder))
-            {
-                Console.WriteLine("Only stakeholder can delete project");
-                return;
-            }
-
+            IsSteakHolder("delete");
             var projects = GetAllProjects();
             DisplayAllProjects();
             
@@ -151,7 +142,53 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
     {
         try
         {
+            IsSteakHolder("update");
+            Console.Clear();
+            var project = GetProject("update");
+            while (true)
+            {
+                Console.WriteLine("\nUpdate operations:");
+                Console.WriteLine("1. Update title");
+                Console.WriteLine("2. Update description");
+                Console.WriteLine("3. Add Tasks");
+                Console.WriteLine("4. Add Users");
+                Console.WriteLine("6. Exit");
+                
+                Console.Write("Enter the operation number: ");
+                string input = Console.ReadLine();
             
+                if (input == "6")
+                {
+                    break;
+                }
+            
+                Console.Clear();
+                switch (input)
+                {
+                    case "1":
+                        Console.Write("Enter new title:");
+                        string title = Console.ReadLine();
+                        _service.UpdateTitle(project.Id, title);
+                        break;
+                    case "2":
+                        Console.Write("Enter new description");
+                        string description = Console.ReadLine();
+                        _service.UpdateDescription(project.Id, description);
+                        break;
+                    case "3":
+                        var tasks = GetTasks();
+                        _service.UpdateTasks(project.Id, tasks);
+                        break;
+                    case "4":
+                        var users = GetUsers();
+                        _service.UpdateUsers(project.Id, users);
+                        break;
+                    default:
+                        Console.WriteLine("Invalid operation number."); 
+                        break;
+                }
+                Console.WriteLine("Task successfully updated");
+            }
         }
         catch (Exception ex)
         {
@@ -174,10 +211,15 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
 
     private void DisplayAllTask(Project project)
     {
-        var tasks = project.Tasks;
+        List<Task> tasks = new List<Task>();
+        foreach (var task in project.Tasks)
+        {
+            tasks.Add(_taskConsoleManager.GetByPredicate(t => t.Id.Equals(task.Id)));
+        }
+        
         if (tasks.Count == 0)
         {
-            throw new Exception("Tasks not added yet");
+            Console.WriteLine("Task not added yet");
         }
 
         int index = 1;
@@ -214,6 +256,12 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
             Console.WriteLine("Enter username, which need to add");
             string username = Console.ReadLine();
             User user = _userConsoleManager.GetByPredicate(u => u.Username.Equals(username));
+            if (users.Contains(user))
+            {
+                Console.WriteLine("This user already added");
+                continue;
+            }
+            
             users.Add(user);
             Console.WriteLine($"Username: {user.Username}, Role: {user.Role} - will add in project");
             
@@ -239,6 +287,12 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
                 Console.WriteLine("This task already added");
                 continue;
             }
+
+            if (task.TaskProgress == TaskProgress.NotStarted)
+            {
+                task.TaskProgress = TaskProgress.InProgress;
+                _taskConsoleManager.Update(task.Id, task);
+            }
             
             tasks.Add(task);
             Console.WriteLine($"Your tasks will add in project");
@@ -253,15 +307,49 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
             return tasks;
         }
     }
+    
+    private void IsSteakHolder(string reason)
+    {
+        if (!_user.Role.Equals(UserRole.Stakeholder))
+        {
+            throw new Exception($"Only stakeholder can {reason} projects");
+        }
+    }
  
     public void GetUser(Guid userId)
     {
         _user = _userConsoleManager.GetById(userId);
     }
+    
+    private Project GetProject(string cause)
+    {
+        DisplayAllProjects();
+        var projects = GetAllProjects();
+        if (projects.Count == 0)
+        {
+            throw new Exception("Projects not added yet");
+        }
+        
+        Console.Write($"Choose project to {cause}:");
+        int input = Int32.Parse(Console.ReadLine());
+        return projects[input - 1];
+    }
 
     public void Task()
     {
-        _taskConsoleManager.GetUser(_userConsoleManager.User.Id);
-        _taskConsoleManager.PerformOperations();
+        try
+        {
+            DisplayAllProjects();
+            var projects = _service.GetAllProjects();
+            Console.Write("Choose project:");
+            int input = Int32.Parse(Console.ReadLine());
+            _taskConsoleManager.GetProject(projects[input - 1]);
+            _taskConsoleManager.GetUser(_userConsoleManager.User.Id);
+            _taskConsoleManager.PerformOperations();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to work with task. Exception: {ex.Message}");
+        }
     }
 }

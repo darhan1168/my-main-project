@@ -8,9 +8,13 @@ namespace BLL;
 
 public class ProjectService : GenericService<Project>, IProjectService
 {
-    public ProjectService(IRepository<Project> repository) :
+    private readonly IUserService _userService;
+    private readonly ITaskService _taskService;
+    public ProjectService(IRepository<Project> repository, IUserService userService, ITaskService taskService) :
         base(repository)
     {
+        _userService = userService;
+        _taskService = taskService;
     }
     
     public void CreateProject(Project project)
@@ -73,13 +77,47 @@ public class ProjectService : GenericService<Project>, IProjectService
                 throw new Exception("Task not found");
             }
 
-            project.Tasks = newTasks;
+            List<Task> tasks = new List<Task>();
+            foreach (var task in project.Tasks)
+            {
+                tasks.Add(_taskService.GetByPredicate(t => t.Id.Equals(task.Id)));
+            }
+            
+            foreach (var task in newTasks)
+            {
+                tasks.Add(task);
+            }
+            
+            project.Tasks = tasks;
             Update(projectId, project);
         }
         catch (Exception ex)
         {
             throw new Exception($"Failed to update {newTasks} in project by {projectId}. Exception: {ex.Message}");
         }
+    }
+
+    public void UpdateUsers(Guid projectId, List<User> newUsers)
+    {
+        var project = GetById(projectId);
+        if (project is null)
+        {
+            throw new Exception("Task not found");
+        }
+        
+        List<User> users = new List<User>();
+        foreach (var user in project.Users)
+        {
+            users.Add(_userService.GetByPredicate(u => u.Id.Equals(user.Id)));
+        }
+            
+        foreach (var user in newUsers)
+        {
+            users.Add(user);
+        }
+        
+        project.Users = users;
+        Update(projectId, project);
     }
 
     public void DeleteProject(Guid projectId)
@@ -99,8 +137,14 @@ public class ProjectService : GenericService<Project>, IProjectService
         try
         {
             var project = GetById(projectId);
-            int completedTasksCount = project.Tasks.Count(t => t.TaskProgress.Equals(TaskProgress.Completed));
-            int totalTasksCount = project.Tasks.Count;
+            List<Task> tasks = new List<Task>();
+            foreach (var task in project.Tasks)
+            {
+                tasks.Add(_taskService.GetByPredicate(t => t.Id.Equals(task.Id)));
+            }
+            
+            int completedTasksCount = tasks.Count(t => t.TaskProgress.Equals(TaskProgress.Completed));
+            int totalTasksCount = tasks.Count;
             double completionPercentage = (completedTasksCount / (double)totalTasksCount) * 100;
             
             project.CompletionRate = completionPercentage;
