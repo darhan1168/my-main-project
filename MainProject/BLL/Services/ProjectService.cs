@@ -80,7 +80,11 @@ public class ProjectService : GenericService<Project>, IProjectService
             List<Task> tasks = new List<Task>();
             foreach (var task in project.Tasks)
             {
-                tasks.Add(_taskService.GetByPredicate(t => t.Id.Equals(task.Id)));
+                var taskService = _taskService.GetAll().FirstOrDefault(t => t.Id.Equals(task.Id));
+                if (taskService is not null)
+                {
+                    tasks.Add(taskService);
+                }
             }
             
             foreach (var task in newTasks)
@@ -140,7 +144,11 @@ public class ProjectService : GenericService<Project>, IProjectService
             List<Task> tasks = new List<Task>();
             foreach (var task in project.Tasks)
             {
-                tasks.Add(_taskService.GetByPredicate(t => t.Id.Equals(task.Id)));
+                var taskService = _taskService.GetAll().FirstOrDefault(t => t.Id.Equals(task.Id));
+                if (taskService is not null)
+                {
+                    tasks.Add(taskService);
+                }
             }
             
             int completedTasksCount = tasks.Count(t => t.TaskProgress.Equals(TaskProgress.Completed));

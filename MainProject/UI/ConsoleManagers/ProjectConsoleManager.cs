@@ -214,7 +214,11 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         List<Task> tasks = new List<Task>();
         foreach (var task in project.Tasks)
         {
-            tasks.Add(_taskConsoleManager.GetByPredicate(t => t.Id.Equals(task.Id)));
+            var taskService = _taskConsoleManager.GetAll().FirstOrDefault(t => t.Id.Equals(task.Id));
+            if (taskService is not null)
+            {
+                tasks.Add(taskService);
+            }
         }
         
         if (tasks.Count == 0)
