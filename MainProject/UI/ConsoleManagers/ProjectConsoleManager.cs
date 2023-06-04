@@ -34,10 +34,10 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         while (true)
         {
             Console.WriteLine("\nProject operations:");
-            Console.WriteLine("1. Display all project"); //all
-            Console.WriteLine("2. Create a new project"); //steak
-            Console.WriteLine("3. Update a project"); //all
-            Console.WriteLine("4. Delete a project"); //steak
+            Console.WriteLine("1. Display all project");
+            Console.WriteLine("2. Create a new project");
+            Console.WriteLine("3. Update a project");
+            Console.WriteLine("4. Delete a project"); 
             Console.WriteLine("5. Work with my task");
             Console.WriteLine("6. Exit");
 
