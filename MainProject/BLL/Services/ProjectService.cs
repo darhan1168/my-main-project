@@ -1,6 +1,7 @@
 using BLL.Abstraction.Interfaces;
 using Core;
 using Core.Enums;
+using DAL;
 using DAL.Abstraction.Interfaces;
 using Task = Core.Task;
 
@@ -10,8 +11,8 @@ public class ProjectService : GenericService<Project>, IProjectService
 {
     private readonly IUserService _userService;
     private readonly ITaskService _taskService;
-    public ProjectService(IRepository<Project> repository, IUserService userService, ITaskService taskService) :
-        base(repository)
+    public ProjectService(IRepository<Project> repository, IUnitOfWork unitOfWork, IUserService userService, ITaskService taskService) :
+        base(repository, unitOfWork)
     {
         _userService = userService;
         _taskService = taskService;
@@ -162,18 +163,6 @@ public class ProjectService : GenericService<Project>, IProjectService
         catch (Exception ex)
         {
             throw new Exception($"Failed to get completion rate. Exception: {ex.Message}");
-        }
-    }
-
-    public List<Project> GetAllProjects()
-    {
-        try
-        {
-            return GetAll();
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Failed to get all projects. Exception: {ex.Message}");
         }
     }
 

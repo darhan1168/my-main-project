@@ -1,8 +1,8 @@
 using Core;
 using Microsoft.EntityFrameworkCore;
-using Task = Core.Task;
+using Task = System.Threading.Tasks.Task;
 
-namespace UI;
+namespace DAL;
 
 public class AppContext : DbContext
 {

@@ -19,8 +19,6 @@ public interface IProjectService : IGenericService<Project>
 
     double GetCompletionRate(Guid projectId);
 
-    List<Project> GetAllProjects();
-    
     List<Project> GetProjectsByTitle(string title);
     
     List<Project> GetProjectsByTask(Task task);

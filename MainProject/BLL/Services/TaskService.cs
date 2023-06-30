@@ -4,6 +4,7 @@ using DAL.Abstraction.Interfaces;
 using Task = Core.Task;
 using BLL.Abstraction.Interfaces;
 using Core.Enums;
+using DAL;
 using Exception = System.Exception;
 
 namespace BLL;
@@ -12,8 +13,8 @@ public class TaskService : GenericService<Task>, ITaskService
 {
     private readonly IUserService _userService;
     
-    public TaskService(IRepository<Task> repository, IUserService userService) :
-        base(repository)
+    public TaskService(IRepository<Task> repository, IUnitOfWork unitOfWork, IUserService userService) :
+        base(repository, unitOfWork)
     {
         _userService = userService;
     }

@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Core;
 
 namespace UI.Interfaces;
@@ -10,7 +11,7 @@ public interface IConsoleManager<TEntity> where TEntity : BaseEntity
 
     TEntity GetById(Guid id);
 
-    TEntity GetByPredicate(Func<TEntity, bool> predicate);
+    TEntity GetByPredicate(Expression<Func<TEntity, bool>> predicate);
 
     void Add(TEntity obj);
 

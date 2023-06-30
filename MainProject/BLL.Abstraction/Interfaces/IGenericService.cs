@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Core;
 
 namespace BLL.Abstraction.Interfaces;
@@ -12,7 +13,7 @@ public interface IGenericService<T> where T : BaseEntity
 
     List<T> GetAll();
 
-    T GetByPredicate(Func<T, bool> predicate);
+    T GetByPredicate(Expression<Func<T, bool>> predicate);
 
     void Update(Guid id, T obj);
 }

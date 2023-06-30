@@ -59,7 +59,7 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
             }
         }
     }
-    
+
     public void DisplayAllProjects()
     {
         try
@@ -344,7 +344,7 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         try
         {
             DisplayAllProjects();
-            var projects = _service.GetAllProjects();
+            var projects = _service.GetAll();
             Console.Write("Choose project:");
             int input = Int32.Parse(Console.ReadLine());
             _taskConsoleManager.GetProject(projects[input - 1]);

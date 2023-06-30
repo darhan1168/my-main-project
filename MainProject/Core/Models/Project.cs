@@ -1,5 +1,8 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Core;
 
+[Table("Projects")]
 public class Project : BaseEntity
 {
     public string Title { get; set; }

@@ -1,14 +1,15 @@
+using System.Linq.Expressions;
 using Core;
 
 namespace DAL.Abstraction.Interfaces
 {
     public interface IRepository<T> where T : BaseEntity
     {
-        List<T> GetAll(int pageNumber = 1, int pageSize = 10);
+        IQueryable<T> GetAll();
 
         T GetById(Guid id);
 
-        T GetByPredicate(Func<T, bool> predicate);
+        T GetByPredicate(Expression<Func<T, bool>> predicate);
 
         void Add(T obj);
 

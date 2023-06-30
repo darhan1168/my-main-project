@@ -1,7 +1,9 @@
-﻿using Core.Enums;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Core.Enums;
 
 namespace Core;
 
+[Table("Users")]
 public class User : BaseEntity
 { 
     public string Username { get; set; }

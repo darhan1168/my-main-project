@@ -6,8 +6,8 @@ namespace BLL;
 
 public class UserService : GenericService<User>, IUserService
 {
-    public UserService(IRepository<User> repository) :
-        base(repository)
+    public UserService(IRepository<User> repository,  IUnitOfWork unitOfWork) :
+        base(repository, unitOfWork)
     {
     }
     

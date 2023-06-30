@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using BLL.Abstraction.Interfaces;
 using Core;
 using UI.Interfaces;
@@ -45,7 +46,7 @@ public abstract class ConsoleManager<TService, TEntity>
         }
     }
 
-    public virtual TEntity GetByPredicate(Func<TEntity, bool> predicate)
+    public virtual TEntity GetByPredicate(Expression<Func<TEntity, bool>> predicate)
     {
         try
         {
