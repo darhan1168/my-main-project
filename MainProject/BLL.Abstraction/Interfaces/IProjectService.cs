@@ -17,9 +17,5 @@ public interface IProjectService : IGenericService<Project>
 
     void DeleteProject(Guid projectId);
 
-    double GetCompletionRate(Guid projectId);
-
-    List<Project> GetProjectsByTitle(string title);
-    
-    List<Project> GetProjectsByTask(Task task);
+    Task<double> GetCompletionRate(Guid projectId);
 }

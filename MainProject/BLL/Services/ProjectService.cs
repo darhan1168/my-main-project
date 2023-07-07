@@ -68,7 +68,7 @@ public class ProjectService : GenericService<Project>, IProjectService
         }
     }
 
-    public void UpdateTasks(Guid projectId, List<Task> newTasks)
+    public async void UpdateTasks(Guid projectId, List<Task> newTasks)
     {
         try
         {
@@ -81,7 +81,7 @@ public class ProjectService : GenericService<Project>, IProjectService
             List<Task> tasks = new List<Task>();
             foreach (var task in project.Tasks)
             {
-                var taskService = _taskService.GetAll().FirstOrDefault(t => t.Id.Equals(task.Id));
+                var taskService = await _taskService.GetByPredicate(t => t.Id.Equals(task.Id));
                 if (taskService is not null)
                 {
                     tasks.Add(taskService);
@@ -102,7 +102,7 @@ public class ProjectService : GenericService<Project>, IProjectService
         }
     }
 
-    public void UpdateUsers(Guid projectId, List<User> newUsers)
+    public async void UpdateUsers(Guid projectId, List<User> newUsers)
     {
         var project = GetById(projectId);
         if (project is null)
@@ -113,7 +113,8 @@ public class ProjectService : GenericService<Project>, IProjectService
         List<User> users = new List<User>();
         foreach (var user in project.Users)
         {
-            users.Add(_userService.GetByPredicate(u => u.Id.Equals(user.Id)));
+            var specialUser = await _userService.GetByPredicate(u => u.Id.Equals(user.Id));
+            users.Add(specialUser);
         }
             
         foreach (var user in newUsers)
@@ -137,7 +138,7 @@ public class ProjectService : GenericService<Project>, IProjectService
         }
     }
 
-    public double GetCompletionRate(Guid projectId)
+    public async Task<double> GetCompletionRate(Guid projectId)
     {
         try
         {
@@ -145,7 +146,7 @@ public class ProjectService : GenericService<Project>, IProjectService
             List<Task> tasks = new List<Task>();
             foreach (var task in project.Tasks)
             {
-                var taskService = _taskService.GetAll().FirstOrDefault(t => t.Id.Equals(task.Id));
+                var taskService = await _taskService.GetByPredicate(t => t.Id.Equals(task.Id));
                 if (taskService is not null)
                 {
                     tasks.Add(taskService);
@@ -163,30 +164,6 @@ public class ProjectService : GenericService<Project>, IProjectService
         catch (Exception ex)
         {
             throw new Exception($"Failed to get completion rate. Exception: {ex.Message}");
-        }
-    }
-
-    public List<Project> GetProjectsByTitle(string title)
-    {
-        try
-        {
-            return GetAll().Where(p => p.Title.Equals(title)).ToList();
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Failed to get projects by {title}. Exception: {ex.Message}");
-        }
-    }
-
-    public List<Project> GetProjectsByTask(Task task)
-    {
-        try
-        {
-            return GetAll().Where(p => p.Tasks.Contains(task)).ToList();
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Failed to get projects by {task.Title}. Exception: {ex.Message}");
         }
     }
 }

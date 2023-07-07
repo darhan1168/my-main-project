@@ -6,12 +6,12 @@ namespace UI.Interfaces;
 public interface IConsoleManager<TEntity> where TEntity : BaseEntity
 {
     void PerformOperations();
-    
-    IEnumerable<TEntity> GetAll();
 
     TEntity GetById(Guid id);
 
-    TEntity GetByPredicate(Expression<Func<TEntity, bool>> predicate);
+    Task<TEntity> GetByPredicate(Expression<Func<TEntity, bool>> predicate);
+    
+    Task<List<TEntity>> GetListByPredicate(Expression<Func<TEntity, bool>> predicate);
 
     void Add(TEntity obj);
 

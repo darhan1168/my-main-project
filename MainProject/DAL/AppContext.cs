@@ -11,9 +11,13 @@ public class AppContext : DbContext
     public DbSet<TaskFile> Files { get; set; }
     public DbSet<User> Users { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    public AppContext(DbContextOptions<AppContext> options) : base(options)
     {
-        optionsBuilder.UseSqlServer(
-            @"Server=localhost;Database=MainProject;TrustServerCertificate=True;User=sa;Password=reallyStrongPwd123;");
+        Database.EnsureCreated();
+    }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    { 
+        optionsBuilder.UseSqlServer(@"Server=localhost;Database=MainProject;User=sa;Password=reallyStrongPwd123;TrustServerCertificate=True;");
     }
 }

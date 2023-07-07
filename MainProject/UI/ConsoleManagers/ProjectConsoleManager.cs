@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using BLL.Abstraction.Interfaces;
 using Core;
 using Core.Enums;
@@ -60,12 +61,12 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         }
     }
 
-    public void DisplayAllProjects()
+    public async void DisplayAllProjects()
     {
         try
         {
             Console.Clear();
-            var projects = GetAllProjects();
+            var projects = await GetAllProjects();
 
             int index = 1;
             foreach (var project in projects)
@@ -88,7 +89,7 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         }
     }
 
-    public void CreateProject()
+    public async void CreateProject()
     {
         try
         {
@@ -100,8 +101,8 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
             Console.Write("Enter description:");
             string description = Console.ReadLine();
 
-            var users = GetUsers();
-            var tasks = GetTasks();
+            var users = await GetUsers();
+            var tasks = await GetTasks();
             
             _service.CreateProject(new Project()
             {
@@ -119,12 +120,12 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         }
     }
     
-    public void DeleteProject()
+    public async void DeleteProject()
     {
         try
         {
             IsSteakHolder("delete");
-            var projects = GetAllProjects();
+            var projects = await GetAllProjects();
             DisplayAllProjects();
             
             Console.WriteLine("Enter number of project for deleting");
@@ -138,13 +139,13 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         }
     }
     
-    public void UpdateProject()
+    public async void UpdateProject()
     {
         try
         {
             IsSteakHolder("update");
             Console.Clear();
-            var project = GetProject("update");
+            var project = await GetProject("update");
             while (true)
             {
                 Console.WriteLine("\nUpdate operations:");
@@ -176,11 +177,11 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
                         _service.UpdateDescription(project.Id, description);
                         break;
                     case "3":
-                        var tasks = GetTasks();
+                        var tasks = await GetTasks();
                         _service.UpdateTasks(project.Id, tasks);
                         break;
                     case "4":
-                        var users = GetUsers();
+                        var users = await GetUsers();
                         _service.UpdateUsers(project.Id, users);
                         break;
                     default:
@@ -196,11 +197,9 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         }
     }
 
-    private List<Project> GetAllProjects()
+    private async Task<List<Project>> GetAllProjects()
     {
-        var projects = GetAll()
-            .Where(p => p.Users.Any(u => u.Username.Equals(_user.Username)))
-            .ToList();
+        var projects = await GetListByPredicate(p => p.Users.Any(u => u.Username.Equals(_user.Username)));
         if (projects.Count == 0)
         {
             throw new Exception("Projects not added yet");
@@ -209,12 +208,12 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         return projects;
     }
 
-    private void DisplayAllTask(Project project)
+    private async void DisplayAllTask(Project project)
     {
         List<Task> tasks = new List<Task>();
         foreach (var task in project.Tasks)
         {
-            var taskService = _taskConsoleManager.GetAll().FirstOrDefault(t => t.Id.Equals(task.Id));
+            var taskService = await _taskConsoleManager.GetByPredicate(t => t.Id.Equals(task.Id));
             if (taskService is not null)
             {
                 tasks.Add(taskService);
@@ -251,15 +250,15 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         }
     }
 
-    private List<User> GetUsers()
+    private async Task<List<User>> GetUsers()
     {
         List<User> users = new List<User>();
         users.Add(_user);
         while (true)
         {
             Console.WriteLine("Enter username, which need to add");
-            string username = Console.ReadLine();
-            User user = _userConsoleManager.GetByPredicate(u => u.Username.Equals(username));
+            var username = Console.ReadLine();
+            var user = await _userConsoleManager.GetByPredicate(u => u.Username.Equals(username));
             if (users.Contains(user))
             {
                 Console.WriteLine("This user already added");
@@ -280,12 +279,12 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         }
     }
 
-    private List<Task> GetTasks()
+    private async Task<List<Task>> GetTasks()
     {
         List<Task> tasks = new List<Task>();
         while (true)
         {
-            var task = _taskConsoleManager.GetTask("add in project");
+            var task = await _taskConsoleManager.GetTask("add in project");
             if (tasks.Contains(task))
             {
                 Console.WriteLine("This task already added");
@@ -325,10 +324,10 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         _user = _userConsoleManager.GetById(userId);
     }
     
-    private Project GetProject(string cause)
+    private async Task<Project> GetProject(string cause)
     {
         DisplayAllProjects();
-        var projects = GetAllProjects();
+        var projects = await GetAllProjects();
         if (projects.Count == 0)
         {
             throw new Exception("Projects not added yet");
@@ -339,12 +338,12 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         return projects[input - 1];
     }
 
-    public void Task()
+    public async void Task()
     {
         try
         {
             DisplayAllProjects();
-            var projects = _service.GetAll();
+            var projects = await GetAllProjects();
             Console.Write("Choose project:");
             int input = Int32.Parse(Console.ReadLine());
             _taskConsoleManager.GetProject(projects[input - 1]);

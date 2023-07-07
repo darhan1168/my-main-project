@@ -6,9 +6,9 @@ public interface IUserService : IGenericService<User>
 {
     void Registration(User user);
 
-    User Authorization(string username, string password);
+    Task<User> Authorization(string username, string password);
 
-    User GetUserByUsername(string username);
+    Task<User> GetUserByUsername(string username);
 
-    User GetUserByEmail(string email);
+    Task<User> GetUserByEmail(string email);
 }

@@ -5,12 +5,12 @@ namespace BLL;
 
 public class DependencyRegistration
 {
-    public static void RegisterServices(IServiceCollection services)
+    public static void RegisterServices(IServiceCollection services, string connectionString)
     {
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ITaskService, TaskService>();
         services.AddScoped<IProjectService, ProjectService>();
 
-        DAL.DependencyRegistration.RegisterRepositories(services);
+        DAL.DependencyRegistration.RegisterRepositories(services, connectionString);
     }
 }

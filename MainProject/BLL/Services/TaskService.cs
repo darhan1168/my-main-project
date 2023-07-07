@@ -162,33 +162,21 @@ public class TaskService : GenericService<Task>, ITaskService
         }
     }
 
-    public List<Task> GetAllTasks()
+    public async Task<Task> GetTaskByTitle(string title)
     {
         try
         {
-            return GetAll();
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Failed to update get all tasks. Exception: {ex.Message}");
-        }
-    }
-
-    public List<Task> GetTasksByTitle(string title)
-    {
-        try
-        {
-            var tasks = GetAll();
-            if (tasks is null)
+            var task = await GetByPredicate(t => t.Title.Equals(title));
+            if (task is null)
             {
-                throw new Exception("Tasks not found");
+                throw new Exception("Task not found");
             }
 
-            return tasks.Where(t => t.Title.Equals(title)).ToList();
+            return task;
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get task by {title}. Exception: {ex.Message}");
+            throw new Exception($"Failed to get tas by {title}. Exception: {ex.Message}");
         }
     }
 }

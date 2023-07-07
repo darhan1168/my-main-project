@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using System.Net;
 using BLL;
 using BLL.Abstraction.Interfaces;
@@ -59,19 +60,20 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
             }
         }
     }
-    
-    public void DisplayAllTasks()
+
+    public async void DisplayAllTasks()
     {
         try
         {
             Console.Clear();
-            var tasks = _service.GetAll().Where(t => t.Creator.Username.Equals(_user.Username) 
-                                                     || t.ResponsibleUser.Username.Equals(_user.Username)).ToList();
+            var tasks = await _service.GetListByPredicate(t => t.Creator.Username.Equals(_user.Username) 
+                                                               || t.ResponsibleUser.Username.Equals(_user.Username));
             if (tasks.Count == 0)
             {
                 foreach (var task in _project.Tasks)
                 {
-                    tasks.Add(_service.GetByPredicate(t => t.Id.Equals(task.Id)));
+                    var specialTasks = await _service.GetByPredicate(t => t.Id.Equals(task.Id));
+                    tasks.Add(specialTasks);
                 }
             }
             
@@ -94,7 +96,7 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         }
     }
     
-    public void CreateTask()
+    public async void CreateTask()
     {
         try
         {
@@ -108,7 +110,7 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
          
             var deadline = GetDeadline();
             TaskPriority priority = GetTaskPriority();
-            User responsibleUser = ChooseResponsible();
+            User responsibleUser = await ChooseResponsible();
             var files = GetFiles();
 
             Task task = new Task()
@@ -132,13 +134,13 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         }
     }
 
-    public void UpdateTask()
+    public async void UpdateTask()
     {
         try
         {
             IsSteakHolder("update");
             Console.Clear();
-            var task = GetTask("update");
+            var task = await GetTask("update");
             while (true)
             {
                 Console.WriteLine("\nUpdate operations:");
@@ -195,12 +197,12 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         }
     }
 
-    public void CheckTask()
+    public async void CheckTask()
     {
         try
         {
             Console.Clear();
-            var task = GetTask("check");
+            var task = await GetTask("check");
             if (task.TaskProgress.Equals(TaskProgress.InProgress)
                 && !task.ResponsibleUser.Username.Equals(_user.Username)
                 && _user.Role.Equals(UserRole.Developer))
@@ -247,13 +249,13 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         }
     }
     
-    public void DeleteTask()
+    public async void DeleteTask()
     {
         try
         {
             IsSteakHolder("delete");
             Console.Clear();
-            var task = GetTask("delete");
+            var task = await GetTask("delete");
             _service.DeleteTask(task.Id);
             Console.WriteLine("Task successfully deleted");
         }
@@ -309,16 +311,17 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         return priorities[input];
     }
 
-    public Task GetTask(string cause)
+    public async Task<Task> GetTask(string cause)
     {
         DisplayAllTasks();
-        var tasks = _service.GetAll().Where(t => t.Creator.Username.Equals(_user.Username) 
-                                                 || t.ResponsibleUser.Username.Equals(_user.Username)).ToList();
+        var tasks = await _service.GetListByPredicate(t => t.Creator.Username.Equals(_user.Username)
+                                                     || t.ResponsibleUser.Username.Equals(_user.Username));
         if (tasks.Count == 0)
         {
             foreach (var task in _project.Tasks)
             {
-                tasks.Add(_service.GetByPredicate(t => t.Id.Equals(task.Id)));
+                var specialTask = await _service.GetByPredicate(t => t.Id.Equals(task.Id));
+                tasks.Add(specialTask);
             }
         }
         
@@ -327,9 +330,9 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         return tasks[inputTask - 1];
     }
     
-    private User ChooseResponsible()
+    private async Task<User> ChooseResponsible()
     {
-        var developers = _userConsoleManager.GetAll().Where(u => u.Role.Equals(UserRole.Developer)).ToList();
+        var developers = await _userConsoleManager.GetListByPredicate(u => u.Role.Equals(UserRole.Developer));
         if (developers.Count == 1)
         {
             throw new Exception("Developers not found");

@@ -52,23 +52,23 @@ public class UserConsoleManager : ConsoleManager<IUserService, User>, IConsoleMa
         }
     }
 
-    public void SignUp()
+    public async void SignUp()
     {
         try
         {
             Console.Clear();
-            var users = _service.GetAll();
-            
             Console.WriteLine("Enter your username");
             string username = Console.ReadLine();
-            if (users.Where(u => u.Username == username).ToList().Count > 0)
+            var usersByUsername = await GetListByPredicate(u => u.Username == username);
+            if (usersByUsername.Count > 0)
             {
                 throw new Exception("This username already use");
             }
 
             Console.WriteLine("Enter your email");
             string email = Console.ReadLine();
-            if (users.Where(u => u.Email == email).ToList().Count > 0)
+            var usersByEmail = await GetListByPredicate(u => u.Email == email);
+            if (usersByEmail.Count > 0)
             {
                 throw new Exception("This email already use");
             }
@@ -101,16 +101,15 @@ public class UserConsoleManager : ConsoleManager<IUserService, User>, IConsoleMa
         }
     }
 
-    public void LogIn()
+    public async void LogIn()
     {
         try
         {
             Console.Clear();
-            var users = _service.GetAll();
-            
             Console.WriteLine("Enter your username");
             string username = Console.ReadLine();
-            if (users.Where(u => u.Username == username).ToList().Count == 0)
+            var usersByUsername = await GetListByPredicate(u => u.Username == username);
+            if (usersByUsername.Count == 0)
             {
                 throw new Exception("This username never used");
             }
@@ -118,7 +117,7 @@ public class UserConsoleManager : ConsoleManager<IUserService, User>, IConsoleMa
             Console.WriteLine("Enter your password");
             string password = Console.ReadLine();
 
-            var user = _service.Authorization(username, password);
+            var user = await _service.Authorization(username, password);
             if (user is not null)
             {
                 IsLogIn = true;

@@ -1,6 +1,7 @@
 ﻿using BLL.Abstraction.Interfaces;
 using Core;
 using DAL.Abstraction.Interfaces;
+using Task = Core.Task;
 
 namespace BLL;
 
@@ -40,11 +41,11 @@ public class UserService : GenericService<User>, IUserService
         }
     }
 
-    public User Authorization(string username, string password)
+    public async Task<User> Authorization(string username, string password)
     {
         try
         {
-            var user = GetUserByUsername(username);
+            var user = await GetUserByUsername(username);
 
             if (user is null)
             {
@@ -64,11 +65,11 @@ public class UserService : GenericService<User>, IUserService
         }
     }
 
-    public User GetUserByUsername(string username)
+    public async Task<User> GetUserByUsername(string username)
     {
         try
         {
-            return GetByPredicate(u => u.Username.Equals(username));
+            return await GetByPredicate(u => u.Username.Equals(username));
         }
         catch (Exception ex)
         {
@@ -76,11 +77,11 @@ public class UserService : GenericService<User>, IUserService
         }
     }
 
-    public User GetUserByEmail(string email)
+    public async Task<User> GetUserByEmail(string email)
     {
         try
         {
-            return GetByPredicate(u => u.Email.Equals(email));
+            return await GetByPredicate(u => u.Email.Equals(email));
         }
         catch (Exception ex)
         {

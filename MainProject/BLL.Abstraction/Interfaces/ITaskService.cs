@@ -21,8 +21,6 @@ public interface ITaskService : IGenericService<Task>
     void TransitionNewStep(Guid taskId);
 
     void DeleteTask(Guid taskId);
-    
-    List<Task> GetAllTasks();
 
-    List<Task> GetTasksByTitle(string title);
+    Task<Task> GetTaskByTitle(string title);
 }

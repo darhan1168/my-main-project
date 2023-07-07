@@ -1,20 +1,23 @@
 using System.Linq.Expressions;
 using Core;
+using Task = System.Threading.Tasks.Task;
 
 namespace DAL.Abstraction.Interfaces
 {
     public interface IRepository<T> where T : BaseEntity
     {
-        IQueryable<T> GetAll();
+        Task<List<T>> ListAsync(Expression<Func<T, bool>> expression);
+        
+        Task<T> GetByIdAsync(Guid id);
 
-        T GetById(Guid id);
+        Task<T> GetByPredicateAsync(Expression<Func<T, bool>> predicate);
 
-        T GetByPredicate(Expression<Func<T, bool>> predicate);
+        Task<List<T>> GetListByPredicateAsync(Expression<Func<T, bool>> predicate);
 
-        void Add(T obj);
+        Task AddAsync(T obj);
 
-        void Update(Guid id, T updateObj);
+        Task UpdateAsync(Guid id, T updateObj);
 
-        void Delete(Guid id);
+        Task DeleteAsync(Guid id);
     }
 }

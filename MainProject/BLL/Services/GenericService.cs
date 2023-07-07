@@ -20,7 +20,7 @@ public class GenericService<T> : IGenericService<T> where T : BaseEntity
     {
         try
         {
-            _repository.Add(obj);
+            _repository.AddAsync(obj);
             _unitOfWork.CommitAsync();
         }
         catch (Exception ex)
@@ -33,7 +33,7 @@ public class GenericService<T> : IGenericService<T> where T : BaseEntity
     {
         try
         {
-            _repository.Delete(id);
+            _repository.DeleteAsync(id);
             _unitOfWork.CommitAsync();
         }
         catch (Exception ex)
@@ -46,7 +46,10 @@ public class GenericService<T> : IGenericService<T> where T : BaseEntity
     {
         try
         {
-            return _repository.GetById(id);
+            var task = _repository.GetByIdAsync(id);
+            task.Wait(); 
+
+            return task.Result;
         }
         catch (Exception ex)
         {
@@ -54,27 +57,15 @@ public class GenericService<T> : IGenericService<T> where T : BaseEntity
         }
     }
 
-    public List<T> GetAll()
+    public async Task<T> GetByPredicate(Expression<Func<T, bool>> predicate)
     {
         try
         {
-            return _repository.GetAll().ToList();
+            return await _repository.GetByPredicateAsync(predicate);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get all {typeof(T).Name}s. Exception: {ex.Message}");
-        }
-    }
-
-    public T GetByPredicate(Expression<Func<T, bool>> predicate)
-    {
-        try
-        {
-            return _repository.GetByPredicate(predicate);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Failed to get by predicate {typeof(T).Name}s. Exception: {ex.Message}");
+            throw new Exception($"Failed to get {typeof(T).Name} by predicate. Exception: {ex.Message}", ex);
         }
     }
 
@@ -82,12 +73,24 @@ public class GenericService<T> : IGenericService<T> where T : BaseEntity
     {
         try
         {
-            _repository.Update(id, obj);
+            _repository.UpdateAsync(id, obj);
             _unitOfWork.CommitAsync();
         }
         catch (Exception ex)
         {
             throw new Exception($"Failed to update {typeof(T).Name} with Id {id}. Exception: {ex.Message}");
+        }
+    }
+    
+    public async Task<List<T>> GetListByPredicate(Expression<Func<T, bool>> predicate)
+    {
+        try
+        {
+            return await _repository.GetListByPredicateAsync(predicate);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get {typeof(T).Name} by predicate. Exception: {ex.Message}", ex);
         }
     }
 }

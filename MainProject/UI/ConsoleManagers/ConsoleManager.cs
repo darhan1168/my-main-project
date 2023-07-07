@@ -18,20 +18,6 @@ public abstract class ConsoleManager<TService, TEntity>
 
     public abstract void PerformOperations();
 
-    public virtual IEnumerable<TEntity> GetAll()
-    {
-        try
-        {
-            return _service.GetAll();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error in GetAll: {ex.Message}");
-                
-            return Enumerable.Empty<TEntity>();
-        }
-    }
-
     public virtual TEntity GetById(Guid id)
     {
         try
@@ -46,17 +32,29 @@ public abstract class ConsoleManager<TService, TEntity>
         }
     }
 
-    public virtual TEntity GetByPredicate(Expression<Func<TEntity, bool>> predicate)
+    public async Task<TEntity> GetByPredicate(Expression<Func<TEntity, bool>> predicate)
     {
         try
         {
-            return _service.GetByPredicate(predicate);
+            return await _service.GetByPredicate(predicate);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error in GetByPredicate: {ex.Message}");
                 
             return null;
+        }
+    }
+    
+    public virtual async Task<List<TEntity>> GetListByPredicate(Expression<Func<TEntity, bool>> predicate)
+    {
+        try
+        {
+            return await _service.GetListByPredicate(predicate);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get by predicate. Exception: {ex.Message}", ex);
         }
     }
 

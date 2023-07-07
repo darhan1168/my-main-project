@@ -3,6 +3,7 @@ using Core;
 using DAL.Abstraction.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Task = System.Threading.Tasks.Task;
 
 namespace DAL
 {
@@ -20,37 +21,45 @@ namespace DAL
         {
             _dbFactory = dbFactory;
         }
+
+        public async Task<T> GetByPredicateAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await DbSet.Where(predicate).FirstOrDefaultAsync();
+        }
         
-        public IQueryable<T> GetAll()
+        public async Task<List<T>> GetListByPredicateAsync(Expression<Func<T, bool>> predicate)
         {
-            return _dbSet;
+            return await DbSet.Where(predicate).ToListAsync();
         }
 
-        public T GetById(Guid id)
+        public async Task AddAsync(T obj)
         {
-            return _dbSet.Where(o => o.Id.Equals(id)).FirstOrDefault();
+            await DbSet.AddAsync(obj);
         }
 
-        public T GetByPredicate(Expression<Func<T, bool>> predicate)
+        public async Task DeleteAsync(Guid id)
         {
-            return _dbSet.Where(predicate).FirstOrDefault();
+            var entity = await GetByIdAsync(id);
+            
+            DbSet.Remove(entity);
         }
 
-        public void Add(T obj)
+        public async Task<List<T>> ListAsync(Expression<Func<T, bool>> expression)
         {
-            DbSet.Add(obj);
+            return await DbSet.Where(expression).ToListAsync();
         }
 
-        public void Update(Guid id, T updateObj)
+        public async Task<T> GetByIdAsync(Guid id)
         {
-            var obj = GetById(id);
-            obj = updateObj;
-            DbSet.Update(obj);
+            return await DbSet.Where(e => e.Id.Equals(id)).FirstOrDefaultAsync();
         }
 
-        public void Delete(Guid id)
+        public async Task UpdateAsync(Guid id, T updateObj)
         {
-            DbSet.Remove(GetById(id));
+            var entity = await GetByIdAsync(id);
+            entity = updateObj;
+            
+            DbSet.Update(entity);
         }
     }
 }

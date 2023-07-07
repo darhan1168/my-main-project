@@ -11,9 +11,9 @@ public interface IGenericService<T> where T : BaseEntity
 
     T GetById(Guid id);
 
-    List<T> GetAll();
-
-    T GetByPredicate(Expression<Func<T, bool>> predicate);
+    Task<T> GetByPredicate(Expression<Func<T, bool>> predicate);
+    
+    Task<List<T>> GetListByPredicate(Expression<Func<T, bool>> predicate);
 
     void Update(Guid id, T obj);
 }

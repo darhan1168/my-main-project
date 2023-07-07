@@ -6,7 +6,7 @@ namespace UI;
 
 public class DependencyRegistration
 {
-    public static IServiceProvider Register()
+    public static IServiceProvider Register(string connectionString)
     {
         var services = new ServiceCollection();
         services.AddScoped<AppManager>();
@@ -22,8 +22,8 @@ public class DependencyRegistration
             services.AddScoped(interfaceType, type);
         }
         
-        BLL.DependencyRegistration.RegisterServices(services);
-        
+        BLL.DependencyRegistration.RegisterServices(services, connectionString);
+
         return services.BuildServiceProvider();
     }
 }

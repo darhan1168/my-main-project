@@ -13,7 +13,7 @@ public class DbFactory : IDisposable
     {
         _instanceFunc = dbContextFactory;
     }
-    
+
     public void Dispose()
     {
         if (!_disposed && _dbContext != null)
