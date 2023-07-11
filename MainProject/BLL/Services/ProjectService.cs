@@ -3,7 +3,8 @@ using Core;
 using Core.Enums;
 using DAL;
 using DAL.Abstraction.Interfaces;
-using Task = Core.Task;
+using Task = System.Threading.Tasks.Task;
+using TaskProject = Core.Task;
 
 namespace BLL;
 
@@ -21,11 +22,11 @@ public class ProjectService : GenericService<Project>, IProjectService
         _userProjectService = userProjectService;
     }
     
-    public void CreateProject(Project project)
+    public async Task CreateProject(Project project)
     {
         try
         {
-            Add(project);
+            await Add(project);
         }
         catch (Exception ex)
         {
@@ -33,18 +34,18 @@ public class ProjectService : GenericService<Project>, IProjectService
         }
     }
 
-    public void UpdateTitle(Guid projectId, string newTitle)
+    public async Task UpdateTitle(Guid projectId, string newTitle)
     {
         try
         {
-            var project = GetById(projectId);
+            var project = await GetById(projectId);
             if (project is null)
             {
                 throw new Exception("Task not found");
             }
 
             project.Title = newTitle;
-            Update(projectId, project);
+            await Update(projectId, project);
         }
         catch (Exception ex)
         {
@@ -52,18 +53,18 @@ public class ProjectService : GenericService<Project>, IProjectService
         }
     }
 
-    public void UpdateDescription(Guid projectId, string newDescription)
+    public async Task UpdateDescription(Guid projectId, string newDescription)
     {
         try
         {
-            var project = GetById(projectId);
+            var project = await GetById(projectId);
             if (project is null)
             {
                 throw new Exception("Task not found");
             }
 
             project.Description = newDescription;
-            Update(projectId, project);
+            await Update(projectId, project);
         }
         catch (Exception ex)
         {
@@ -71,17 +72,17 @@ public class ProjectService : GenericService<Project>, IProjectService
         }
     }
 
-    public async void UpdateTasks(Guid projectId, List<Task> newTasks)
+    public async Task UpdateTasks(Guid projectId, List<TaskProject> newTasks)
     {
         try
         {
-            var project = GetById(projectId);
+            var project = await GetById(projectId);
             if (project is null)
             {
                 throw new Exception("Task not found");
             }
 
-            List<Task> tasks = new List<Task>();
+            List<TaskProject> tasks = new List<TaskProject>();
             foreach (var task in project.Tasks)
             {
                 var taskService = await _taskService.GetByPredicate(t => t.Id.Equals(task.Id));
@@ -97,7 +98,7 @@ public class ProjectService : GenericService<Project>, IProjectService
             }
             
             project.Tasks = tasks;
-            Update(projectId, project);
+            await Update(projectId, project);
         }
         catch (Exception ex)
         {
@@ -105,9 +106,9 @@ public class ProjectService : GenericService<Project>, IProjectService
         }
     }
 
-    public async void UpdateUsers(Guid projectId, List<UserProject> newUsers)
+    public async Task UpdateUsers(Guid projectId, List<UserProject> newUsers)
     {
-        var project = GetById(projectId);
+        var project = await GetById(projectId);
         if (project is null)
         {
             throw new Exception("Task not found");
@@ -126,14 +127,14 @@ public class ProjectService : GenericService<Project>, IProjectService
         }
         
         project.UserProjects = users;
-        Update(projectId, project);
+        await Update(projectId, project);
     }
 
-    public void DeleteProject(Guid projectId)
+    public async Task DeleteProject(Guid projectId)
     {
         try
         {
-            Delete(projectId);
+            await Delete(projectId);
         }
         catch (Exception ex)
         {
@@ -145,8 +146,9 @@ public class ProjectService : GenericService<Project>, IProjectService
     {
         try
         {
-            var project = GetById(projectId);
-            List<Task> tasks = new List<Task>();
+            var project = await GetById(projectId);
+            
+            List<TaskProject> tasks = new List<TaskProject>();
             foreach (var task in project.Tasks)
             {
                 var taskService = await _taskService.GetByPredicate(t => t.Id.Equals(task.Id));
@@ -161,7 +163,8 @@ public class ProjectService : GenericService<Project>, IProjectService
             double completionPercentage = (completedTasksCount / (double)totalTasksCount) * 100;
             
             project.CompletionRate = completionPercentage;
-            Update(projectId, project);
+            await Update(projectId, project);
+            
             return completionPercentage;
         }
         catch (Exception ex)
@@ -170,8 +173,8 @@ public class ProjectService : GenericService<Project>, IProjectService
         }
     }
 
-    public void AddUserProject(User user, Project project)
+    public async Task AddUserProject(User user, Project project)
     {
-        _userProjectService.CreateUserProject(user, project);
+        await _userProjectService.CreateUserProject(user, project);
     }
 }

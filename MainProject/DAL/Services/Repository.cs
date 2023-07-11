@@ -31,6 +31,7 @@ namespace DAL
         public async Task AddAsync(T obj)
         {
             await _dbSet.AddAsync(obj);
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(Guid id)
@@ -38,6 +39,8 @@ namespace DAL
             var entity = await GetByIdAsync(id);
             
             _dbSet.Remove(entity);
+            
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task<List<T>> ListAsync(Expression<Func<T, bool>> expression)
@@ -56,6 +59,8 @@ namespace DAL
             entity = updateObj;
             
             _dbSet.Update(entity);
+            
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

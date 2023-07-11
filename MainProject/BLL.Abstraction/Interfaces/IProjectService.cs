@@ -1,23 +1,24 @@
 using Core;
-using Task = Core.Task;
+using Task = System.Threading.Tasks.Task;
+using TaskProject = Core.Task;
 
 namespace BLL.Abstraction.Interfaces;
 
 public interface IProjectService : IGenericService<Project>
 {
-    void CreateProject(Project project);
+    Task CreateProject(Project project);
 
-    void UpdateTitle(Guid projectId, string newTitle);
+    Task UpdateTitle(Guid projectId, string newTitle);
     
-    void UpdateDescription(Guid projectId, string newDescription);
+    Task UpdateDescription(Guid projectId, string newDescription);
     
-    void UpdateTasks(Guid projectId, List<Task> newTasks);
+    Task UpdateTasks(Guid projectId, List<TaskProject> newTasks);
     
-    void UpdateUsers(Guid projectId, List<UserProject> newUsers);
+    Task UpdateUsers(Guid projectId, List<UserProject> newUsers);
 
-    void DeleteProject(Guid projectId);
+    Task DeleteProject(Guid projectId);
 
     Task<double> GetCompletionRate(Guid projectId);
 
-    void AddUserProject(User user, Project project);
+    Task AddUserProject(User user, Project project);
 }

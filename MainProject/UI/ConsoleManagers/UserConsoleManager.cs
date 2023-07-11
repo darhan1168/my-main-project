@@ -18,10 +18,15 @@ public class UserConsoleManager : ConsoleManager<IUserService, User>, IConsoleMa
     
     public User User { get; set; }
 
-    public override void PerformOperations()
+    public override async Task PerformOperations()
     {
         while (true)
         {
+            if (IsLogIn)
+            {
+                return;
+            }
+            
             Console.WriteLine("\nUser operations:");
             Console.WriteLine("1. Sign up");
             Console.WriteLine("2. Log in");
@@ -33,10 +38,10 @@ public class UserConsoleManager : ConsoleManager<IUserService, User>, IConsoleMa
             switch (input)
             {
                 case "1":
-                    SignUp();
+                    await SignUp();
                     break;
                 case "2":
-                    LogIn();
+                    await LogIn();
                     break;
                 case "3":
                     Environment.Exit(0);
@@ -80,7 +85,7 @@ public class UserConsoleManager : ConsoleManager<IUserService, User>, IConsoleMa
                 throw new Exception("Incorrect password");
             }
             
-            _service.Registration(new User()
+            await _service.Registration(new User()
             {
                 Id = Guid.NewGuid(),
                 Username = username,
@@ -89,6 +94,7 @@ public class UserConsoleManager : ConsoleManager<IUserService, User>, IConsoleMa
                 Role = GetUserRole(),
                 UserProjects = new List<UserProject>()
             });
+            
             Console.WriteLine("You successfully sign up, you need to log in");
         }
         catch (Exception ex)

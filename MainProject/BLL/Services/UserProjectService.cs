@@ -1,6 +1,7 @@
 using BLL.Abstraction.Interfaces;
 using Core;
 using DAL.Abstraction.Interfaces;
+using Task = System.Threading.Tasks.Task;
 
 namespace BLL;
 
@@ -11,7 +12,7 @@ public class UserProjectService : GenericService<UserProject>, IUserProjectServi
     {
     }
 
-    public void CreateUserProject(User user, Project project)
+    public async Task CreateUserProject(User user, Project project)
     {
         var userProject = new UserProject()
         {
@@ -21,6 +22,6 @@ public class UserProjectService : GenericService<UserProject>, IUserProjectServi
             ProjectId = project.Id
         };
         
-        Add(userProject);
+        await Add(userProject);
     }
 }

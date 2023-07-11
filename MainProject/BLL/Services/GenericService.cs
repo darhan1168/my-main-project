@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using BLL.Abstraction.Interfaces;
 using Core;
 using DAL.Abstraction.Interfaces;
+using Task = System.Threading.Tasks.Task;
 
 namespace BLL;
 
@@ -16,12 +17,12 @@ public class GenericService<T> : IGenericService<T> where T : BaseEntity
         _unitOfWork = unitOfWork;
     }
 
-    public void Add(T obj)
+    public async Task Add(T obj)
     {
         try
         {
-            _repository.AddAsync(obj);
-            _unitOfWork.CommitAsync();
+            await _repository.AddAsync(obj);
+            //await _unitOfWork.CommitAsync();
         }
         catch (Exception ex)
         {
@@ -29,12 +30,12 @@ public class GenericService<T> : IGenericService<T> where T : BaseEntity
         }
     }
 
-    public void Delete(Guid id)
+    public async Task Delete(Guid id)
     {
         try
         {
-            _repository.DeleteAsync(id);
-            _unitOfWork.CommitAsync();
+            await _repository.DeleteAsync(id);
+            //await _unitOfWork.CommitAsync();
         }
         catch (Exception ex)
         {
@@ -42,14 +43,11 @@ public class GenericService<T> : IGenericService<T> where T : BaseEntity
         }
     }
 
-    public T GetById(Guid id)
+    public async Task<T> GetById(Guid id)
     {
         try
         {
-            var task = _repository.GetByIdAsync(id);
-            task.Wait(); 
-
-            return task.Result;
+            return await _repository.GetByIdAsync(id);
         }
         catch (Exception ex)
         {
@@ -69,12 +67,12 @@ public class GenericService<T> : IGenericService<T> where T : BaseEntity
         }
     }
 
-    public void Update(Guid id, T obj)
+    public async Task Update(Guid id, T obj)
     {
         try
         {
-            _repository.UpdateAsync(id, obj);
-            _unitOfWork.CommitAsync();
+            await _repository.UpdateAsync(id, obj);
+            //await _unitOfWork.CommitAsync();
         }
         catch (Exception ex)
         {

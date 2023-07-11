@@ -1,21 +1,22 @@
 using System.Linq.Expressions;
 using Core;
+using Task = System.Threading.Tasks.Task;
 
 namespace UI.Interfaces;
 
 public interface IConsoleManager<TEntity> where TEntity : BaseEntity
 {
-    void PerformOperations();
+    Task PerformOperations();
 
-    TEntity GetById(Guid id);
+    Task<TEntity> GetById(Guid id);
 
     Task<TEntity> GetByPredicate(Expression<Func<TEntity, bool>> predicate);
     
     Task<List<TEntity>> GetListByPredicate(Expression<Func<TEntity, bool>> predicate);
 
-    void Add(TEntity obj);
+    Task Add(TEntity obj);
 
-    void Update(Guid id, TEntity updateObj);
+    Task Update(Guid id, TEntity updateObj);
 
-    void Delete(Guid id);
+    Task Delete(Guid id);
 }

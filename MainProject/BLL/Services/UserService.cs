@@ -1,7 +1,7 @@
 ﻿using BLL.Abstraction.Interfaces;
 using Core;
 using DAL.Abstraction.Interfaces;
-using Task = Core.Task;
+using Task = System.Threading.Tasks.Task;
 
 namespace BLL;
 
@@ -12,7 +12,7 @@ public class UserService : GenericService<User>, IUserService
     {
     }
     
-    public void Registration(User user)
+    public async Task Registration(User user)
     {
         try
         {
@@ -33,7 +33,7 @@ public class UserService : GenericService<User>, IUserService
                 throw new Exception("PasswordHash is null");
             }
             
-            Add(user);
+            await Add(user);
         }
         catch (Exception ex)
         {

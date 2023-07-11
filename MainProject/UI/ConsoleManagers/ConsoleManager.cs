@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using BLL.Abstraction.Interfaces;
 using Core;
-using UI.Interfaces;
+using Task = System.Threading.Tasks.Task;
 
 namespace UI.ConsoleManagers;
 
@@ -16,13 +16,13 @@ public abstract class ConsoleManager<TService, TEntity>
         _service = service ?? throw new ArgumentNullException(nameof(service));
     }
 
-    public abstract void PerformOperations();
+    public abstract Task PerformOperations();
 
-    public virtual TEntity GetById(Guid id)
+    public virtual async Task<TEntity> GetById(Guid id)
     {
         try
         {
-            return _service.GetById(id);
+            return await _service.GetById(id);
         }
         catch (Exception ex)
         {
@@ -58,7 +58,7 @@ public abstract class ConsoleManager<TService, TEntity>
         }
     }
 
-    public virtual void Add(TEntity obj)
+    public virtual async Task Add(TEntity obj)
     {
         if (obj == null)
         {
@@ -67,7 +67,7 @@ public abstract class ConsoleManager<TService, TEntity>
         
         try
         {
-            _service.Add(obj);
+            await _service.Add(obj);
         }
         catch (Exception ex)
         {
@@ -75,7 +75,7 @@ public abstract class ConsoleManager<TService, TEntity>
         }
     }
 
-    public virtual void Update(Guid id, TEntity updateObj)
+    public virtual async Task Update(Guid id, TEntity updateObj)
     {
         if (updateObj == null)
         {
@@ -84,7 +84,7 @@ public abstract class ConsoleManager<TService, TEntity>
         
         try
         {
-            _service.Update(id, updateObj);
+            await _service.Update(id, updateObj);
         }
         catch (Exception ex)
         {
@@ -92,11 +92,11 @@ public abstract class ConsoleManager<TService, TEntity>
         }
     }
 
-    public virtual void Delete(Guid id)
+    public virtual async Task Delete(Guid id)
     {
         try
         {
-            _service.Delete(id);
+            await _service.Delete(id);
         }
         catch (Exception ex)
         {

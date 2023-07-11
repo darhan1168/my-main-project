@@ -1,10 +1,11 @@
 using Core;
+using Task = System.Threading.Tasks.Task;
 
 namespace BLL.Abstraction.Interfaces;
 
 public interface IUserService : IGenericService<User>
 {
-    void Registration(User user);
+    Task Registration(User user);
 
     Task<User> Authorization(string username, string password);
 

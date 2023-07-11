@@ -1,29 +1,27 @@
 using BLL.Abstraction.Interfaces;
-using Core;
 using DAL.Abstraction.Interfaces;
-using Task = Core.Task;
-using BLL.Abstraction.Interfaces;
+using Task = System.Threading.Tasks.Task;
+using TaskProject = Core.Task;
 using Core.Enums;
-using DAL;
 using Exception = System.Exception;
 
 namespace BLL;
 
-public class TaskService : GenericService<Task>, ITaskService
+public class TaskService : GenericService<TaskProject>, ITaskService
 {
     private readonly IUserService _userService;
 
-    public TaskService(IRepository<Task> repository, IUnitOfWork unitOfWork, IUserService userService) :
+    public TaskService(IRepository<TaskProject> repository, IUnitOfWork unitOfWork, IUserService userService) :
         base(repository, unitOfWork)
     {
         _userService = userService;
     }
     
-    public void CreateTask(Task task)
+    public async Task CreateTask(TaskProject task)
     {
         try
         {
-            Add(task);
+            await Add(task);
         }
         catch (Exception ex)
         {
@@ -31,18 +29,18 @@ public class TaskService : GenericService<Task>, ITaskService
         }
     }
 
-    public void UpdateTitle(Guid taskId, string newTitle)
+    public async Task UpdateTitle(Guid taskId, string newTitle)
     {
         try
         {
-            var task = GetById(taskId);
+            var task = await GetById(taskId);
             if (task is null)
             {
                 throw new Exception("Task not found");
             }
 
             task.Title = newTitle;
-            Update(taskId, task);
+            await Update(taskId, task);
         }
         catch (Exception ex)
         {
@@ -50,18 +48,18 @@ public class TaskService : GenericService<Task>, ITaskService
         }
     }
 
-    public void UpdateDescription(Guid taskId, string newDescription)
+    public async Task UpdateDescription(Guid taskId, string newDescription)
     {
         try
         {
-            var task = GetById(taskId);
+            var task = await GetById(taskId);
             if (task is null)
             {
                 throw new Exception("Task not found");
             }
 
             task.Description = newDescription;
-            Update(taskId, task);
+            await Update(taskId, task);
         }
         catch (Exception ex)
         {
@@ -69,18 +67,18 @@ public class TaskService : GenericService<Task>, ITaskService
         }
     }
 
-    public void UpdateDeadline(Guid taskId, DateTime newDeadline)
+    public async Task UpdateDeadline(Guid taskId, DateTime newDeadline)
     {
         try
         {
-            var task = GetById(taskId);
+            var task = await GetById(taskId);
             if (task is null)
             {
                 throw new Exception("Task not found");
             }
 
             task.Deadline = newDeadline;
-            Update(taskId, task);
+            await Update(taskId, task);
         }
         catch (Exception ex)
         {
@@ -88,18 +86,18 @@ public class TaskService : GenericService<Task>, ITaskService
         }
     }
 
-    public void UpdateTaskPriority(Guid taskId, TaskPriority newTaskPriority)
+    public async Task UpdateTaskPriority(Guid taskId, TaskPriority newTaskPriority)
     {
         try
         {
-            var task = GetById(taskId);
+            var task = await GetById(taskId);
             if (task is null)
             {
                 throw new Exception("Task not found");
             }
 
             task.TaskPriority = newTaskPriority;
-            Update(taskId, task);
+            await Update(taskId, task);
         }
         catch (Exception ex)
         {
@@ -107,18 +105,18 @@ public class TaskService : GenericService<Task>, ITaskService
         }
     }
 
-    public void UpdateTaskProgress(Guid taskId, TaskProgress newTaskProgress)
+    public async Task UpdateTaskProgress(Guid taskId, TaskProgress newTaskProgress)
     {
         try
         {
-            var task = GetById(taskId);
+            var task = await GetById(taskId);
             if (task is null)
             {
                 throw new Exception("Task not found");
             }
 
             task.TaskProgress = newTaskProgress;
-            Update(taskId, task);
+            await Update(taskId, task);
         }
         catch (Exception ex)
         {
@@ -126,9 +124,9 @@ public class TaskService : GenericService<Task>, ITaskService
         }
     }
 
-    public void TransitionNewStep(Guid taskId)
+    public async Task TransitionNewStep(Guid taskId)
     {
-        var task = GetById(taskId);
+        var task = await GetById(taskId);
         if (task.TaskProgress.Equals(TaskProgress.InProgress))
         {
             task.TaskProgress = TaskProgress.Tested;
@@ -142,19 +140,14 @@ public class TaskService : GenericService<Task>, ITaskService
             task.TaskProgress = TaskProgress.Completed;
         }
         
-        Update(taskId, task);
+        await Update(taskId, task);
     }
 
-    public void CheckTask()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void DeleteTask(Guid taskId)
+    public async Task DeleteTask(Guid taskId)
     {
         try
         {
-            Delete(taskId);
+            await Delete(taskId);
         }
         catch (Exception ex)
         {
@@ -162,7 +155,7 @@ public class TaskService : GenericService<Task>, ITaskService
         }
     }
 
-    public async Task<Task> GetTaskByTitle(string title)
+    public async Task<TaskProject> GetTaskByTitle(string title)
     {
         try
         {

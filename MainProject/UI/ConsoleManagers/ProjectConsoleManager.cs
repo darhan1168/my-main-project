@@ -3,7 +3,8 @@ using BLL.Abstraction.Interfaces;
 using Core;
 using Core.Enums;
 using UI.Interfaces;
-using Task = Core.Task;
+using Task = System.Threading.Tasks.Task;
+using TaskProject = Core.Task;
 
 namespace UI.ConsoleManagers;
 
@@ -21,9 +22,9 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         _taskConsoleManager = taskConsoleManager;
     }
 
-    public override void PerformOperations()
+    public override async Task PerformOperations()
     {
-        Dictionary<string, Action> actions = new Dictionary<string, Action>
+        Dictionary<string, Func<Task>> actions = new Dictionary<string, Func<Task>>
         {
             { "1", DisplayAllProjects },
             { "2", CreateProject },
@@ -52,7 +53,7 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
 
             if (actions.ContainsKey(input))
             {
-                actions[input]();
+                await actions[input]();
             }
             else
             {
@@ -61,7 +62,7 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         }
     }
 
-    public async void DisplayAllProjects()
+    public async Task DisplayAllProjects()
     {
         try
         {
@@ -89,7 +90,7 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         }
     }
 
-    public async void CreateProject()
+    public async Task CreateProject()
     {
         try
         {
@@ -112,8 +113,8 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
                 Tasks = tasks
             };
 
-            _service.CreateProject(project);
-            _service.AddUserProject(user.FirstOrDefault(), project);
+            await _service.CreateProject(project);
+            await _service.AddUserProject(user.FirstOrDefault(), project);
             Console.WriteLine("Your project successfully added");
         }
         catch (Exception ex)
@@ -122,18 +123,18 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         }
     }
     
-    public async void DeleteProject()
+    public async Task DeleteProject()
     {
         try
         {
             IsSteakHolder("delete");
             var projects = await GetAllProjects();
-            DisplayAllProjects();
+            await DisplayAllProjects();
             
             Console.WriteLine("Enter number of project for deleting");
             int input = Int32.Parse(Console.ReadLine());
             
-            _service.DeleteProject(projects[input - 1].Id);
+            await _service.DeleteProject(projects[input - 1].Id);
         }
         catch (Exception ex)
         {
@@ -141,7 +142,7 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         }
     }
     
-    public async void UpdateProject()
+    public async Task UpdateProject()
     {
         try
         {
@@ -171,16 +172,16 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
                     case "1":
                         Console.Write("Enter new title:");
                         string title = Console.ReadLine();
-                        _service.UpdateTitle(project.Id, title);
+                        await _service.UpdateTitle(project.Id, title);
                         break;
                     case "2":
                         Console.Write("Enter new description");
                         string description = Console.ReadLine();
-                        _service.UpdateDescription(project.Id, description);
+                        await _service.UpdateDescription(project.Id, description);
                         break;
                     case "3":
                         var tasks = await GetTasks();
-                        _service.UpdateTasks(project.Id, tasks);
+                        await _service.UpdateTasks(project.Id, tasks);
                         break;
                     case "4":
                         // var users = await GetUsers();
@@ -210,9 +211,9 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         return projects;
     }
 
-    private async void DisplayAllTask(Project project)
+    private async Task DisplayAllTask(Project project)
     {
-        List<Task> tasks = new List<Task>();
+        List<TaskProject> tasks = new List<TaskProject>();
         foreach (var task in project.Tasks)
         {
             var taskService = await _taskConsoleManager.GetByPredicate(t => t.Id.Equals(task.Id));
@@ -236,7 +237,7 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         }
     }
     
-    private void DisplayAllMakers(Project project)
+    private async Task DisplayAllMakers(Project project)
     {
         var userProjects = project.UserProjects;
         if (userProjects.Count == 0)
@@ -247,7 +248,7 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         int index = 1;
         foreach (var userProject in userProjects)
         {
-            var user = _userConsoleManager.GetById(userProject.UserId);
+            var user = await _userConsoleManager.GetById(userProject.UserId);
             
             Console.WriteLine($"{index} - Username: {user.Username}, Role: {user.Role}");
             index++;
@@ -283,9 +284,9 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         }
     }
 
-    private async Task<List<Task>> GetTasks()
+    private async Task<List<TaskProject>> GetTasks()
     {
-        List<Task> tasks = new List<Task>();
+        List<TaskProject> tasks = new List<TaskProject>();
         while (true)
         {
             var task = await _taskConsoleManager.GetTask("add in project");
@@ -298,7 +299,7 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
             if (task.TaskProgress == TaskProgress.NotStarted)
             {
                 task.TaskProgress = TaskProgress.InProgress;
-                _taskConsoleManager.Update(task.Id, task);
+                await _taskConsoleManager.Update(task.Id, task);
             }
             
             tasks.Add(task);
@@ -323,14 +324,14 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         }
     }
  
-    public void GetUser(Guid userId)
+    public async Task GetUser(Guid userId)
     {
-        _user = _userConsoleManager.GetById(userId);
+        _user = await _userConsoleManager.GetById(userId);
     }
     
     private async Task<Project> GetProject(string cause)
     {
-        DisplayAllProjects();
+        await DisplayAllProjects();
         var projects = await GetAllProjects();
         if (projects.Count == 0)
         {
@@ -342,17 +343,19 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
         return projects[input - 1];
     }
 
-    public async void Task()
+    public async Task Task()
     {
         try
         {
-            DisplayAllProjects();
+            await DisplayAllProjects();
             var projects = await GetAllProjects();
+            
             Console.Write("Choose project:");
             int input = Int32.Parse(Console.ReadLine());
-            _taskConsoleManager.GetProject(projects[input - 1]);
-            _taskConsoleManager.GetUser(_userConsoleManager.User.Id);
-            _taskConsoleManager.PerformOperations();
+            
+            await _taskConsoleManager.GetProject(projects[input - 1]);
+            await _taskConsoleManager.GetUser(_userConsoleManager.User.Id);
+            await _taskConsoleManager.PerformOperations();
         }
         catch (Exception ex)
         {

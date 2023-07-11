@@ -1,26 +1,27 @@
 using Core;
 using Core.Enums;
-using Task = Core.Task;
+using Task = System.Threading.Tasks.Task;
+using TaskProject = Core.Task;
 
 namespace BLL.Abstraction.Interfaces;
 
-public interface ITaskService : IGenericService<Task>
+public interface ITaskService : IGenericService<TaskProject>
 {
-    void CreateTask(Task task);
+    Task CreateTask(TaskProject task);
 
-    void UpdateTitle(Guid taskId, string newTitle);
+    Task UpdateTitle(Guid taskId, string newTitle);
     
-    void UpdateDescription(Guid taskId, string newDescription);
+    Task UpdateDescription(Guid taskId, string newDescription);
     
-    void UpdateDeadline(Guid taskId, DateTime newDeadline);
+    Task UpdateDeadline(Guid taskId, DateTime newDeadline);
     
-    void UpdateTaskPriority(Guid taskId, TaskPriority newTaskPriority);
+    Task UpdateTaskPriority(Guid taskId, TaskPriority newTaskPriority);
 
-    void UpdateTaskProgress(Guid taskId, TaskProgress newTaskProgress);
+    Task UpdateTaskProgress(Guid taskId, TaskProgress newTaskProgress);
 
-    void TransitionNewStep(Guid taskId);
+    Task TransitionNewStep(Guid taskId);
 
-    void DeleteTask(Guid taskId);
+    Task DeleteTask(Guid taskId);
 
-    Task<Task> GetTaskByTitle(string title);
+    Task<TaskProject> GetTaskByTitle(string title);
 }

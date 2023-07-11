@@ -5,11 +5,12 @@ using BLL.Abstraction.Interfaces;
 using Core;
 using Core.Enums;
 using UI.Interfaces;
-using Task = Core.Task;
+using Task = System.Threading.Tasks.Task;
+using TaskProject = Core.Task;
 
 namespace UI.ConsoleManagers;
 
-public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleManager<Task>
+public class TaskConsoleManager : ConsoleManager<ITaskService, TaskProject>, IConsoleManager<TaskProject>
 {
     private readonly UserConsoleManager _userConsoleManager;
     private User _user;
@@ -21,9 +22,9 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         _userConsoleManager = userConsoleManager;
     }
 
-    public override void PerformOperations()
+    public override async Task PerformOperations()
     {
-        Dictionary<string, Action> actions = new Dictionary<string, Action>
+        Dictionary<string, Func<Task>> actions = new Dictionary<string, Func<Task>>
         {
             { "1", DisplayAllTasks },
             { "2", CreateTask },
@@ -52,7 +53,7 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
 
             if (actions.ContainsKey(input))
             {
-                actions[input]();
+                await actions[input]();
             }
             else
             {
@@ -61,7 +62,7 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         }
     }
 
-    public async void DisplayAllTasks()
+    public async Task DisplayAllTasks()
     {
         try
         {
@@ -95,7 +96,7 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         }
     }
     
-    public async void CreateTask()
+    public async Task CreateTask()
     {
         try
         {
@@ -118,7 +119,7 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
                 responsibleUser
             };
             
-            Task task = new Task()
+            TaskProject task = new TaskProject()
             {
                 Id = Guid.NewGuid(),
                 Title = title,
@@ -129,7 +130,8 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
                 Users = users,
                 Files = files
             };
-            _service.CreateTask(task);
+            
+            await _service.CreateTask(task);
             Console.WriteLine("Your tasks successfully added");
         }
         catch (Exception ex)
@@ -138,7 +140,7 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         }
     }
 
-    public async void UpdateTask()
+    public async Task UpdateTask()
     {
         try
         {
@@ -201,7 +203,7 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         }
     }
 
-    public async void CheckTask()
+    public async Task CheckTask()
     {
         try
         {
@@ -253,14 +255,16 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         }
     }
     
-    public async void DeleteTask()
+    public async Task DeleteTask()
     {
         try
         {
             IsSteakHolder("delete");
+            
             Console.Clear();
             var task = await GetTask("delete");
-            _service.DeleteTask(task.Id);
+            
+            await _service.DeleteTask(task.Id);
             Console.WriteLine("Task successfully deleted");
         }
         catch (Exception ex)
@@ -269,12 +273,12 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         }
     }
 
-    public void GetUser(Guid userId)
+    public async Task GetUser(Guid userId)
     {
-        _user = _userConsoleManager.GetById(userId);
+        _user = await _userConsoleManager.GetById(userId);
     }
     
-    public void GetProject(Project project)
+    public async Task GetProject(Project project)
     {
         _project = project;
     }
@@ -315,9 +319,9 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         return priorities[input];
     }
 
-    public async Task<Task> GetTask(string cause)
+    public async Task<TaskProject> GetTask(string cause)
     {
-        DisplayAllTasks();
+        await DisplayAllTasks();
         var tasks = await _service.GetListByPredicate(t => t.Users.Any(u => u.Username.Equals(_user.Username)));
         if (tasks.Count == 0)
         {
@@ -415,7 +419,7 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         }
     }
 
-    private void TransitionNewStep(string action, Task task)
+    private void TransitionNewStep(string action, TaskProject task)
     {
         Console.WriteLine($"Enter 1 if you already {action} task and it is correct");
         string input = Console.ReadLine();

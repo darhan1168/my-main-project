@@ -4,7 +4,7 @@ namespace UI
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             Console.BackgroundColor = ConsoleColor.DarkCyan;
             Console.ForegroundColor = ConsoleColor.Black;
@@ -13,7 +13,7 @@ namespace UI
             using (var scope = serviceProvider.CreateScope())
             {
                 var appManager = scope.ServiceProvider.GetService<AppManager>();
-                appManager.Start();
+                appManager.Start().Wait();
             }
         }
     }

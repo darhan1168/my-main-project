@@ -1,5 +1,6 @@
 using Core.Enums;
 using UI.ConsoleManagers;
+using Task = System.Threading.Tasks.Task;
 
 namespace UI;
 
@@ -18,18 +19,18 @@ public class AppManager
         _userConsoleManager = userConsoleManager;
     }
 
-    public void Start()
+    public async Task Start()
     {
         while (true)
         {
-            _userConsoleManager.PerformOperations();
+            await _userConsoleManager.PerformOperations();
         
             while (true)
             {
                 if (_userConsoleManager.IsLogIn && _userConsoleManager.User.Role.Equals(UserRole.Stakeholder))
                 {
-                    _taskConsoleManager.GetUser(_userConsoleManager.User.Id);
-                    _projectConsoleManager.GetUser(_userConsoleManager.User.Id);
+                    await _taskConsoleManager.GetUser(_userConsoleManager.User.Id);
+                    await _projectConsoleManager.GetUser(_userConsoleManager.User.Id);
                     
                     Console.WriteLine("\nChoose an operation:");
                     Console.WriteLine("1. Task operations");
@@ -42,10 +43,10 @@ public class AppManager
                     switch (input)
                     {
                         case "1":
-                            _taskConsoleManager.PerformOperations();
+                            await _taskConsoleManager.PerformOperations();
                             break;
                         case "2":
-                            _projectConsoleManager.PerformOperations();
+                            await _projectConsoleManager.PerformOperations();
                             break;
                         case "3":
                             return;
@@ -65,8 +66,8 @@ public class AppManager
                     switch (input)
                     {
                         case "1":
-                            _projectConsoleManager.GetUser(_userConsoleManager.User.Id);
-                            _projectConsoleManager.PerformOperations();
+                            await _projectConsoleManager.GetUser(_userConsoleManager.User.Id);
+                            await _projectConsoleManager.PerformOperations();
                             break;
                         case "2":
                             return;
