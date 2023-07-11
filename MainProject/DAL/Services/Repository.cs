@@ -9,49 +9,45 @@ namespace DAL
 {
     public class Repository<T> : IRepository<T> where T : BaseEntity
     {
-        private readonly DbFactory _dbFactory;
+        protected readonly AppContext _dbContext;
         private DbSet<T> _dbSet;
-
-        protected DbSet<T> DbSet
+        
+        public Repository(AppContext dbContext)
         {
-            get => _dbSet ?? (_dbSet = _dbFactory.DbContext.Set<T>());
-        }
-
-        public Repository(DbFactory dbFactory)
-        {
-            _dbFactory = dbFactory;
+            _dbContext = dbContext;
+            _dbSet = _dbContext.Set<T>();
         }
 
         public async Task<T> GetByPredicateAsync(Expression<Func<T, bool>> predicate)
         {
-            return await DbSet.Where(predicate).FirstOrDefaultAsync();
+            return await _dbSet.Where(predicate).FirstOrDefaultAsync();
         }
         
         public async Task<List<T>> GetListByPredicateAsync(Expression<Func<T, bool>> predicate)
         {
-            return await DbSet.Where(predicate).ToListAsync();
+            return await _dbSet.Where(predicate).ToListAsync();
         }
 
         public async Task AddAsync(T obj)
         {
-            await DbSet.AddAsync(obj);
+            await _dbSet.AddAsync(obj);
         }
 
         public async Task DeleteAsync(Guid id)
         {
             var entity = await GetByIdAsync(id);
             
-            DbSet.Remove(entity);
+            _dbSet.Remove(entity);
         }
 
         public async Task<List<T>> ListAsync(Expression<Func<T, bool>> expression)
         {
-            return await DbSet.Where(expression).ToListAsync();
+            return await _dbSet.Where(expression).ToListAsync();
         }
 
         public async Task<T> GetByIdAsync(Guid id)
         {
-            return await DbSet.Where(e => e.Id.Equals(id)).FirstOrDefaultAsync();
+            return await _dbSet.Where(e => e.Id.Equals(id)).FirstOrDefaultAsync();
         }
 
         public async Task UpdateAsync(Guid id, T updateObj)
@@ -59,7 +55,7 @@ namespace DAL
             var entity = await GetByIdAsync(id);
             entity = updateObj;
             
-            DbSet.Update(entity);
+            _dbSet.Update(entity);
         }
     }
 }

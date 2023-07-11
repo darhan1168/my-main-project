@@ -11,11 +11,14 @@ public class ProjectService : GenericService<Project>, IProjectService
 {
     private readonly IUserService _userService;
     private readonly ITaskService _taskService;
-    public ProjectService(IRepository<Project> repository, IUnitOfWork unitOfWork, IUserService userService, ITaskService taskService) :
+    private readonly IUserProjectService _userProjectService;
+    public ProjectService(IRepository<Project> repository, IUnitOfWork unitOfWork, IUserService userService, 
+        ITaskService taskService, IUserProjectService userProjectService) :
         base(repository, unitOfWork)
     {
         _userService = userService;
         _taskService = taskService;
+        _userProjectService = userProjectService;
     }
     
     public void CreateProject(Project project)
@@ -102,7 +105,7 @@ public class ProjectService : GenericService<Project>, IProjectService
         }
     }
 
-    public async void UpdateUsers(Guid projectId, List<User> newUsers)
+    public async void UpdateUsers(Guid projectId, List<UserProject> newUsers)
     {
         var project = GetById(projectId);
         if (project is null)
@@ -110,10 +113,10 @@ public class ProjectService : GenericService<Project>, IProjectService
             throw new Exception("Task not found");
         }
         
-        List<User> users = new List<User>();
-        foreach (var user in project.Users)
+        List<UserProject> users = new List<UserProject>();
+        foreach (var user in project.UserProjects)
         {
-            var specialUser = await _userService.GetByPredicate(u => u.Id.Equals(user.Id));
+            var specialUser = await _userProjectService.GetByPredicate(u => u.Id.Equals(user.Id));
             users.Add(specialUser);
         }
             
@@ -122,7 +125,7 @@ public class ProjectService : GenericService<Project>, IProjectService
             users.Add(user);
         }
         
-        project.Users = users;
+        project.UserProjects = users;
         Update(projectId, project);
     }
 
@@ -165,5 +168,10 @@ public class ProjectService : GenericService<Project>, IProjectService
         {
             throw new Exception($"Failed to get completion rate. Exception: {ex.Message}");
         }
+    }
+
+    public void AddUserProject(User user, Project project)
+    {
+        _userProjectService.CreateUserProject(user, project);
     }
 }

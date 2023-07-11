@@ -12,7 +12,7 @@ namespace BLL;
 public class TaskService : GenericService<Task>, ITaskService
 {
     private readonly IUserService _userService;
-    
+
     public TaskService(IRepository<Task> repository, IUnitOfWork unitOfWork, IUserService userService) :
         base(repository, unitOfWork)
     {

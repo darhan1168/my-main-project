@@ -4,6 +4,7 @@ using BLL.Abstraction.Interfaces;
 using Core;
 using Core.Enums;
 using UI.Interfaces;
+using Task = System.Threading.Tasks.Task;
 
 namespace UI.ConsoleManagers;
 
@@ -19,12 +20,6 @@ public class UserConsoleManager : ConsoleManager<IUserService, User>, IConsoleMa
 
     public override void PerformOperations()
     {
-        Dictionary<string, Action> actions = new Dictionary<string, Action>
-        {
-            { "1", SignUp },
-            { "2", LogIn }
-        };
-
         while (true)
         {
             Console.WriteLine("\nUser operations:");
@@ -35,24 +30,25 @@ public class UserConsoleManager : ConsoleManager<IUserService, User>, IConsoleMa
             Console.Write("Enter the operation number: ");
             string input = Console.ReadLine();
 
-            if (input == "3")
+            switch (input)
             {
-                Environment.Exit(0);
-            }
-
-            if (actions.ContainsKey(input))
-            {
-                actions[input]();
-                break;
-            }
-            else
-            {
-                Console.WriteLine("Invalid operation number.");
+                case "1":
+                    SignUp();
+                    break;
+                case "2":
+                    LogIn();
+                    break;
+                case "3":
+                    Environment.Exit(0);
+                    break;
+                default:
+                    Console.WriteLine("Invalid operation number.");
+                    break;
             }
         }
     }
 
-    public async void SignUp()
+    public async Task SignUp()
     {
         try
         {
@@ -91,7 +87,7 @@ public class UserConsoleManager : ConsoleManager<IUserService, User>, IConsoleMa
                 Email = email,
                 PasswordHash = password,
                 Role = GetUserRole(),
-                Projects = new List<Project>()
+                UserProjects = new List<UserProject>()
             });
             Console.WriteLine("You successfully sign up, you need to log in");
         }
@@ -101,7 +97,7 @@ public class UserConsoleManager : ConsoleManager<IUserService, User>, IConsoleMa
         }
     }
 
-    public async void LogIn()
+    public async Task LogIn()
     {
         try
         {

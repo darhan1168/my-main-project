@@ -101,17 +101,19 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
             Console.Write("Enter description:");
             string description = Console.ReadLine();
 
-            var users = await GetUsers();
+            var user = await GetUsers();
             var tasks = await GetTasks();
-            
-            _service.CreateProject(new Project()
+
+            var project = new Project()
             {
                 Id = Guid.NewGuid(),
                 Title = title,
                 Description = description,
-                Users = users,
                 Tasks = tasks
-            });
+            };
+
+            _service.CreateProject(project);
+            _service.AddUserProject(user.FirstOrDefault(), project);
             Console.WriteLine("Your project successfully added");
         }
         catch (Exception ex)
@@ -181,8 +183,8 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
                         _service.UpdateTasks(project.Id, tasks);
                         break;
                     case "4":
-                        var users = await GetUsers();
-                        _service.UpdateUsers(project.Id, users);
+                        // var users = await GetUsers();
+                        // _service.UpdateUsers(project.Id, users);
                         break;
                     default:
                         Console.WriteLine("Invalid operation number."); 
@@ -199,7 +201,7 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
 
     private async Task<List<Project>> GetAllProjects()
     {
-        var projects = await GetListByPredicate(p => p.Users.Any(u => u.Username.Equals(_user.Username)));
+        var projects = await GetListByPredicate(p => p.UserProjects.Any(u => u.UserId.Equals(_user.Id)));
         if (projects.Count == 0)
         {
             throw new Exception("Projects not added yet");
@@ -236,15 +238,17 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
     
     private void DisplayAllMakers(Project project)
     {
-        var users = project.Users;
-        if (users.Count == 0)
+        var userProjects = project.UserProjects;
+        if (userProjects.Count == 0)
         {
-            throw new Exception("Users not added yet");
+            throw new Exception("userProjects not added yet");
         }
-
+        
         int index = 1;
-        foreach (var user in users)
+        foreach (var userProject in userProjects)
         {
+            var user = _userConsoleManager.GetById(userProject.UserId);
+            
             Console.WriteLine($"{index} - Username: {user.Username}, Role: {user.Role}");
             index++;
         }

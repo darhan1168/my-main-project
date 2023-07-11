@@ -66,8 +66,7 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
         try
         {
             Console.Clear();
-            var tasks = await _service.GetListByPredicate(t => t.Creator.Username.Equals(_user.Username) 
-                                                               || t.ResponsibleUser.Username.Equals(_user.Username));
+            var tasks = await _service.GetListByPredicate(t => t.Users.Any(u => u.Username.Equals(_user.Username)));
             if (tasks.Count == 0)
             {
                 foreach (var task in _project.Tasks)
@@ -109,10 +108,16 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
             string description = Console.ReadLine();
          
             var deadline = GetDeadline();
-            TaskPriority priority = GetTaskPriority();
-            User responsibleUser = await ChooseResponsible();
+            var priority = GetTaskPriority();
+            var responsibleUser = await ChooseResponsible();
             var files = GetFiles();
 
+            var users = new List<User>()
+            {
+                _user,
+                responsibleUser
+            };
+            
             Task task = new Task()
             {
                 Id = Guid.NewGuid(),
@@ -121,8 +126,7 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
                 Deadline = deadline,
                 TaskPriority = priority,
                 TaskProgress = TaskProgress.NotStarted,
-                Creator = _user,
-                ResponsibleUser = responsibleUser,
+                Users = users,
                 Files = files
             };
             _service.CreateTask(task);
@@ -204,14 +208,14 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
             Console.Clear();
             var task = await GetTask("check");
             if (task.TaskProgress.Equals(TaskProgress.InProgress)
-                && !task.ResponsibleUser.Username.Equals(_user.Username)
+                && !task.Users.Any(u => u.Username.Equals(_user.Username))
                 && _user.Role.Equals(UserRole.Developer))
             {
                 TransitionNewStep("checked", task);
                 Console.WriteLine("Task successfully checked and wait to test");
             }
             else if ((task.TaskProgress.Equals(TaskProgress.InProgress)
-                     && task.ResponsibleUser.Username.Equals(_user.Username)
+                     && task.Users.Any(u => u.Username.Equals(_user.Username))
                      && _user.Role.Equals(UserRole.Developer))
                      || _user.Role.Equals(UserRole.Tester)
                      || _user.Role.Equals(UserRole.Stakeholder))
@@ -314,8 +318,7 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, Task>, IConsoleMa
     public async Task<Task> GetTask(string cause)
     {
         DisplayAllTasks();
-        var tasks = await _service.GetListByPredicate(t => t.Creator.Username.Equals(_user.Username)
-                                                     || t.ResponsibleUser.Username.Equals(_user.Username));
+        var tasks = await _service.GetListByPredicate(t => t.Users.Any(u => u.Username.Equals(_user.Username)));
         if (tasks.Count == 0)
         {
             foreach (var task in _project.Tasks)

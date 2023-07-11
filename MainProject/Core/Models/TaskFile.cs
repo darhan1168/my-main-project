@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core;
 
-[Table("Files")]
 public class TaskFile : BaseEntity
 {
     public string FileName { get; set; } 
