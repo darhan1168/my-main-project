@@ -1,4 +1,5 @@
-﻿using BLL.Abstraction.Interfaces;
+﻿using System.Text.RegularExpressions;
+using BLL.Abstraction.Interfaces;
 using Core;
 using DAL.Abstraction.Interfaces;
 using Task = System.Threading.Tasks.Task;
@@ -111,5 +112,17 @@ public class UserService : GenericService<User>, IUserService
         {
             throw new Exception($"Failed to check user by {username}. Exception: {ex.Message}");
         }
+    }
+    
+    public async Task<bool> IsValidEmail(string email)
+    {
+        string pattern = @"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$";
+        Regex regex = new Regex(pattern);
+        return regex.IsMatch(email);
+    }
+    
+    public async Task<bool> IsValidPassword(string password)
+    {
+        return password.Length >= 6;
     }
 }

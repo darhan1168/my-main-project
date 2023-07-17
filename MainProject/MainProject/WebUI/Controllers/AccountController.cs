@@ -3,6 +3,7 @@ using BLL.Abstraction.Interfaces;
 using Core;
 using Microsoft.AspNetCore.Mvc;
 using WebUI.Models;
+using Task = System.Threading.Tasks.Task;
 
 namespace WebUI.Controllers;
 
@@ -24,32 +25,59 @@ public class AccountController : Controller
     }
 
     [HttpPost]
-    public async Task<ActionResult> Register(User model)
+    public async Task<ActionResult> Register(UserRegistrationModel model)
     {
-        if (!await _userService.IsValuableUsername(model.Username))
+        try
         {
-            ViewData["UsernameError"] = "This username already used";
-            return View(model);
-        }
+            bool hasErrors = false;
         
-        if (model.PasswordHash.Length < 6)
-        {
-            ViewData["PasswordError"] = "Password should consist of 6 symbols";
-            return View(model);
-        }
+            if (string.IsNullOrWhiteSpace(model.Username) || string.IsNullOrWhiteSpace(model.Password) || string.IsNullOrWhiteSpace(model.Email))
+            {
+                ViewData["GeneralError"] = "Please all fields must be completed";
+                return View(model);
+            }
         
-        var user = new User
-        {
-            Username = model.Username,
-            Email = model.Email,
-            PasswordHash = model.PasswordHash,
-            Role = model.Role,
-            UserProjects = new List<UserProject>()
-        };
+            if (!await _userService.IsValuableUsername(model.Username))
+            {
+                ViewData["UsernameError"] = "This username already used";
+                hasErrors = true;
+            }
         
-        await _userService.Registration(user);
+            if (!await _userService.IsValidPassword(model.Password))
+            {
+                ViewData["PasswordError"] = "Password should consist of 6 symbols";
+                hasErrors = true;
+            }
+
+            if (!await _userService.IsValidEmail(model.Email))
+            {
+                ViewData["EmailError"] = "This email is not correct";
+                hasErrors = true;
+            }
+
+            if (hasErrors)
+            {
+                return View(model);
+            }
+        
+            var user = new User
+            {
+                Username = model.Username,
+                Email = model.Email,
+                PasswordHash = model.Password,
+                Role = model.Role,
+                UserProjects = new List<UserProject>()
+            };
+        
+            await _userService.Registration(user);
     
-        return RedirectToAction("Login", "Account");
+            return RedirectToAction("Login", "Account");
+        }
+        catch (Exception e)
+        {
+            ViewData["GeneralError"] = $"Error : {e}";
+            return View(model);
+        }
     }
     
     [HttpGet]
