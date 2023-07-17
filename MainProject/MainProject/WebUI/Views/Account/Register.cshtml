@@ -6,40 +6,49 @@
     // Layout = "~/Views/Shared/_LayoutPage1.cshtml";
 }
 
-@using (Html.BeginForm("Register", "Account", FormMethod.Post))
-{
-    <div>
-        @Html.LabelFor(m => m.Username)
-        @Html.TextBoxFor(m => m.Username)
-        @if (!string.IsNullOrEmpty(ViewData["UsernameError"] as string))
-        {
-            <span style="color: red;">@ViewData["UsernameError"]</span>
-        }
+<div class="row justify-content-md-center">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                Register
+            </div>
+            <div class="card-body">
+                @using (Html.BeginForm("Register", "Account", FormMethod.Post))
+                {
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Username)
+                        @Html.TextBoxFor(m => m.Username, new { @class = "form-control", @placeholder = "Enter your username" })
+                        @if (!string.IsNullOrEmpty(ViewData["UsernameError"] as string))
+                        {
+                            <span style="color: red;">@ViewData["UsernameError"]</span>
+                        }
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Email)
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @placeholder = "Enter your email" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.PasswordHash)
+                        @Html.PasswordFor(m => m.PasswordHash, new { @class = "form-control", @placeholder = "Enter your password" })
+                        @if (!string.IsNullOrEmpty(ViewData["PasswordError"] as string))
+                        {
+                            <span style="color: red;">@ViewData["PasswordError"]</span>
+                        }
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Role)
+                        @Html.DropDownListFor(m => m.Role, Enum.GetValues(typeof(UserRole)).Cast<UserRole>().Select(r => new SelectListItem
+                        {
+                            Text = r.ToString(),
+                            Value = r.ToString()
+                        }), new { @class = "form-control custom-select" })
+                    </div>
+                    <button type="submit" class="btn btn-primary">Register</button>
+                }
+            </div>
+        </div>
     </div>
-    <div>
-        @Html.LabelFor(m => m.Email)
-        @Html.TextBoxFor(m => m.Email)
-    </div>
-    <div>
-        @Html.LabelFor(m => m.PasswordHash)
-        @Html.PasswordFor(m => m.PasswordHash)
-        @if (!string.IsNullOrEmpty(ViewData["PasswordError"] as string))
-        {
-            <span style="color: red;">@ViewData["PasswordError"]</span>
-        }
-    </div>
-    <div>
-        @Html.LabelFor(m => m.Role)
-        @Html.DropDownListFor(m => m.Role, Enum.GetValues(typeof(UserRole)).Cast<UserRole>().Select(r => new SelectListItem
-        {
-            Text = r.ToString(),
-            Value = r.ToString()
-        }))
-    </div>
-    <button type="submit">Register</button>
-}
-
-
+</div>
 
 
 @* @{ *@
