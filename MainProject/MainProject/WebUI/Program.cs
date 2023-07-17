@@ -1,7 +1,25 @@
+using BLL;
+using BLL.Abstraction.Interfaces;
+using DAL;
+using DAL.Abstraction.Interfaces;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<IUserProjectService, UserProjectService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
+//builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<DAL.AppContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
 
 var app = builder.Build();
 

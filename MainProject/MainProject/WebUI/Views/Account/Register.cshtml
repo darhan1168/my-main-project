@@ -1,0 +1,70 @@
+@using Core.Enums
+@model Core.User
+
+@using (Html.BeginForm("Register", "Account", FormMethod.Post))
+{
+    <div>
+        @Html.LabelFor(m => m.Username)
+        @Html.TextBoxFor(m => m.Username)
+    </div>
+    <div>
+        @Html.LabelFor(m => m.Email)
+        @Html.TextBoxFor(m => m.Email)
+    </div>
+    <div>
+        @Html.LabelFor(m => m.PasswordHash)
+        @Html.PasswordFor(m => m.PasswordHash)
+    </div>
+    <div>
+        @Html.LabelFor(m => m.Role)
+        @Html.DropDownListFor(m => m.Role, Enum.GetValues(typeof(UserRole)).Cast<UserRole>().Select(r => new SelectListItem
+        {
+            Text = r.ToString(),
+            Value = r.ToString()
+        }))
+    </div>
+    <button type="submit">Register</button>
+}
+
+
+
+
+@* @{ *@
+@*     ViewBag.Title = "Register"; *@
+@* } *@
+@* *@
+@* <h2>Register</h2> *@
+@* *@
+@* *@
+@* <div> *@
+@*     @using (Html.BeginForm("SaveRegisterDetails", "Account")) *@
+@*     { *@
+@*         <div style="color:red;">@Html.ValidationSummary()</div> *@
+@*         <div class="row"> *@
+@*             <!--Show details are saved successfully message--> *@
+@*             <div class="col-lg-12">@ViewBag.Message</div> *@
+@*         </div><br/> *@
+@*         <div class="row"> *@
+@*             <div class="col-lg-2">@Html.LabelFor(a => a.Username)</div> *@
+@*             <div class="col-lg-10">@Html.TextBoxFor(a => a.Username, new { @class = "form-control" })</div> *@
+@*         </div><br /> *@
+@*         <div class="row"> *@
+@*             <div class="col-lg-2">@Html.LabelFor(a => a.Email)</div> *@
+@*             <div class="col-lg-10">@Html.TextBoxFor(a => a.Email, new { @class = "form-control" })</div> *@
+@*         </div><br /> *@
+@*         <div class="row"> *@
+@*             <div class="col-lg-2">@Html.LabelFor(a => a.PasswordHash)</div> *@
+@*             <div class="col-lg-10">@Html.TextBoxFor(a => a.PasswordHash, new { @class = "form-control", type = "Password" })</div> *@
+@*         </div><br /> *@
+@*         <div> * *@
+@*                 @Html.LabelFor(m => m.Role) *@
+@*                 @Html.DropDownListFor(m => m.Role, Enum.GetValues(typeof(UserRole)).Cast<UserRole>().Select(r => new SelectListItem *@
+@*                 { *@
+@*                     Text = r.ToString(), *@
+@*                     Value = r.ToString() *@
+@*                 })) *@
+@*             </div> *@
+@*         <input type="submit" value="Register" class="btn btn-primary" /> *@
+@*     } *@
+@* *@
+@* </div> *@
