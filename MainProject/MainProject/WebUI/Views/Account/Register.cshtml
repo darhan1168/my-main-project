@@ -1,11 +1,20 @@
 @using Core.Enums
 @model Core.User
 
+@{
+    ViewBag.Title = "Register";
+    // Layout = "~/Views/Shared/_LayoutPage1.cshtml";
+}
+
 @using (Html.BeginForm("Register", "Account", FormMethod.Post))
 {
     <div>
         @Html.LabelFor(m => m.Username)
         @Html.TextBoxFor(m => m.Username)
+        @if (!string.IsNullOrEmpty(ViewData["UsernameError"] as string))
+        {
+            <span style="color: red;">@ViewData["UsernameError"]</span>
+        }
     </div>
     <div>
         @Html.LabelFor(m => m.Email)
@@ -14,6 +23,10 @@
     <div>
         @Html.LabelFor(m => m.PasswordHash)
         @Html.PasswordFor(m => m.PasswordHash)
+        @if (!string.IsNullOrEmpty(ViewData["PasswordError"] as string))
+        {
+            <span style="color: red;">@ViewData["PasswordError"]</span>
+        }
     </div>
     <div>
         @Html.LabelFor(m => m.Role)

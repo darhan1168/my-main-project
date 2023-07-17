@@ -45,6 +45,11 @@ public class UserService : GenericService<User>, IUserService
     {
         try
         {
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            {
+                throw new Exception("Invalid username or password.");
+            }
+            
             var user = await GetUserByUsername(username);
 
             if (user is null)
@@ -86,6 +91,25 @@ public class UserService : GenericService<User>, IUserService
         catch (Exception ex)
         {
             throw new Exception($"Failed to get user by {email}. Exception: {ex.Message}");
+        }
+    }
+
+    public async Task<bool> IsValuableUsername(string username)
+    {
+        try
+        {
+            var user = await GetUserByUsername(username);
+
+            if (user is null)
+            {
+                return true;
+            }
+
+            return false;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to check user by {username}. Exception: {ex.Message}");
         }
     }
 }

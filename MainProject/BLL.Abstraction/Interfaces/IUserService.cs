@@ -12,4 +12,6 @@ public interface IUserService : IGenericService<User>
     Task<User> GetUserByUsername(string username);
 
     Task<User> GetUserByEmail(string email);
+
+    Task<bool> IsValuableUsername(string username);
 }
