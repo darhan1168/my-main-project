@@ -71,7 +71,7 @@ public class AccountController : Controller
                 {
                     IsLogIn = true;
                     User = await _userService.GetUserByUsername(model.Username);
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("TaskMenu", "Task", new { username = user.Username });
                 }
                 else
                 {
