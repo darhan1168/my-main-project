@@ -12,7 +12,7 @@ public class DependencyRegistration
             options.UseSqlServer(connectionString);
         });
         
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        //services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
     }
 }

@@ -13,9 +13,9 @@ public class ProjectService : GenericService<Project>, IProjectService
     private readonly IUserService _userService;
     private readonly ITaskService _taskService;
     private readonly IUserProjectService _userProjectService;
-    public ProjectService(IRepository<Project> repository, IUnitOfWork unitOfWork, IUserService userService, 
+    public ProjectService(IRepository<Project> repository, IUserService userService, 
         ITaskService taskService, IUserProjectService userProjectService) :
-        base(repository, unitOfWork)
+        base(repository)
     {
         _userService = userService;
         _taskService = taskService;

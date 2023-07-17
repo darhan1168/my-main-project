@@ -9,12 +9,10 @@ namespace BLL;
 public class GenericService<T> : IGenericService<T> where T : BaseEntity
 {
     private readonly IRepository<T> _repository;
-    private readonly IUnitOfWork _unitOfWork;
 
-    protected GenericService(IRepository<T> repository, IUnitOfWork unitOfWork)
+    protected GenericService(IRepository<T> repository)
     {
         _repository = repository;
-        _unitOfWork = unitOfWork;
     }
 
     public async Task Add(T obj)

@@ -7,8 +7,8 @@ namespace BLL;
 
 public class UserProjectService : GenericService<UserProject>, IUserProjectService
 {
-    public UserProjectService(IRepository<UserProject> repository, IUnitOfWork unitOfWork) 
-        : base(repository, unitOfWork)
+    public UserProjectService(IRepository<UserProject> repository) 
+        : base(repository)
     {
     }
 
