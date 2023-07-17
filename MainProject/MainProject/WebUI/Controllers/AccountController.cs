@@ -71,7 +71,7 @@ public class AccountController : Controller
                 {
                     IsLogIn = true;
                     User = await _userService.GetUserByUsername(model.Username);
-                    return RedirectToAction("TaskMenu", "Task");
+                    return RedirectToAction("Index", "Home");
                 }
                 else
                 {
@@ -88,30 +88,4 @@ public class AccountController : Controller
             return View(model);
         }
     }
-    
-    // [HttpPost]
-    // public async Task<ViewResult> SaveRegisterDetails(User model)
-    // {
-    //     if (ModelState.IsValid)
-    //     {
-    //         var user = new User
-    //         {
-    //             Username = model.Username,
-    //             Email = model.Email,
-    //             PasswordHash = model.PasswordHash,
-    //             Role = model.Role,
-    //             UserProjects = new List<UserProject>()
-    //         };
-    //     
-    //         await _userService.Registration(user);
-    //         
-    //         ViewBag.Message = "User Details Saved";
-    //         return View("Register");
-    //     }
-    //     else
-    //     {
-    //         
-    //         return View("Register", model);
-    //     }
-    // }
 }
