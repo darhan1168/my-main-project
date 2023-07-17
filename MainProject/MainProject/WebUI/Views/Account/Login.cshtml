@@ -44,5 +44,5 @@
 
 @if (!string.IsNullOrEmpty(ViewData["LoginError"] as string))
 {
-    <div>@ViewData["LoginError"]</div>
+    <span style="color: red;">@ViewData["LoginError"]</span>
 }

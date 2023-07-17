@@ -93,6 +93,12 @@ public class AccountController : Controller
         {
             if (ModelState.IsValid)
             {
+                if (string.IsNullOrWhiteSpace(model.Username) || string.IsNullOrWhiteSpace(model.Password))
+                {
+                    ViewData["LoginError"] = "Please all fields must be completed";
+                    return View(model);
+                }
+                
                 var user = await _userService.Authorization(model.Username, model.Password);
             
                 if (user != null)
@@ -103,8 +109,8 @@ public class AccountController : Controller
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Invalid username or password.");
-                    return View();
+                    ViewData["LoginError"] = "Incorrect username or password";
+                    return View(model);
                 }
             }
         
@@ -112,7 +118,7 @@ public class AccountController : Controller
         }
         catch (Exception e)
         {
-            ViewData["PasswordError"] = "Password should consist of 6 symbols";
+            ViewData["LoginError"] = $"Error: {e.Message}";
             return View(model);
         }
     }
