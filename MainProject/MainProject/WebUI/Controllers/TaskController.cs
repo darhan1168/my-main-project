@@ -25,12 +25,42 @@ public class TaskController : Controller
         _session = httpContextAccessor.HttpContext.Session;
     }
     
-    public async Task<ViewResult> TaskMenu(string username)
+    public async Task<ViewResult> TaskMenu()
     {
-        var user = await _userService.GetUserByUsername(username);
-        User = user;
+        var tasks = await _taskService.GetTasksByUserId(User.Id);
+
+        var viewModel = new TaskMenuViewModel
+        {
+            User = User,
+            Tasks = tasks
+        };
         
-        return View(user);
+        return View(viewModel);
+    }
+
+    public async Task<ViewResult> Create()
+    {
+        return View();
+    }
+    
+    [HttpPost]
+    public async Task<ActionResult> Create(TaskViewModel model)
+    {
+        var task = new TaskProject()
+        {
+            Description = model.Description,
+            Title = model.Title,
+            Deadline = model.Deadline,
+            Files = new List<TaskFile>(),
+            TaskPriority = model.TaskPriority,
+            TaskProgress = TaskProgress.NotStarted,
+            Users = new List<User>()
+        };
+        
+        await _taskService.CreateTask(task);
+        return RedirectToAction("TaskMenu", "Task", new { username = User.Username });
+    }
+
     private User GetUserFromSession()
     {
         var authenticatedUser = _session.GetString("AuthenticatedUser");

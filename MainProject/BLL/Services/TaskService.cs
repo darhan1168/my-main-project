@@ -169,7 +169,21 @@ public class TaskService : GenericService<TaskProject>, ITaskService
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get tas by {title}. Exception: {ex.Message}");
+            throw new Exception($"Failed to get task by {title}. Exception: {ex.Message}");
+        }
+    }
+
+    public async Task<List<TaskProject>> GetTasksByUserId(Guid id)
+    {
+        try
+        {
+            var user = await _userService.GetById(id);
+            
+            return await GetListByPredicate(t => t.Users.Any(u => u.Username.Equals(user.Username)));
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get task by user id {id}. Exception: {ex.Message}");
         }
     }
 }

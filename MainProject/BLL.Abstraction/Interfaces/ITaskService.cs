@@ -9,6 +9,8 @@ public interface ITaskService : IGenericService<TaskProject>
 {
     Task CreateTask(TaskProject task);
 
+    Task UpdateAll(Guid taskId, TaskProject newTask);
+
     Task UpdateTitle(Guid taskId, string newTitle);
     
     Task UpdateDescription(Guid taskId, string newDescription);
@@ -24,4 +26,6 @@ public interface ITaskService : IGenericService<TaskProject>
     Task DeleteTask(Guid taskId);
 
     Task<TaskProject> GetTaskByTitle(string title);
+
+    Task<List<TaskProject>> GetTasksByUserId(Guid id);
 }
