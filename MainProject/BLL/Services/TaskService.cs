@@ -29,6 +29,29 @@ public class TaskService : GenericService<TaskProject>, ITaskService
         }
     }
 
+    public async Task UpdateAll(Guid taskId, TaskProject newTask)
+    {
+        try
+        {
+            var task = await GetById(taskId);
+            if (task is null)
+            {
+                throw new Exception("Task not found");
+            }
+
+            task.TaskProgress = newTask.TaskProgress;
+            task.TaskPriority = newTask.TaskPriority;
+            task.Title = newTask.Title;
+            task.Deadline = newTask.Deadline;
+            task.Description = task.Description;
+            await Update(taskId, task);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to update {newTask.Title}. Exception: {ex.Message}");
+        }
+    }
+
     public async Task UpdateTitle(Guid taskId, string newTitle)
     {
         try
