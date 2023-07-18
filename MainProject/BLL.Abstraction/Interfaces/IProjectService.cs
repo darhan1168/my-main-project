@@ -7,6 +7,7 @@ namespace BLL.Abstraction.Interfaces;
 public interface IProjectService : IGenericService<Project>
 {
     Task CreateProject(Project project);
+    Task UpdateAll(Guid projectId, Project newProject);
 
     Task UpdateTitle(Guid projectId, string newTitle);
     

@@ -33,6 +33,26 @@ public class ProjectService : GenericService<Project>, IProjectService
             throw new Exception($"Failed to create {project.Title}. Exception: {ex.Message}");
         }
     }
+    
+    public async Task UpdateAll(Guid projectId, Project newProject)
+    {
+        try
+        {
+            var project = await GetById(projectId);
+            if (project is null)
+            {
+                throw new Exception("project not found");
+            }
+
+            project.Title = newProject.Title;
+            project.Description = newProject.Description;
+            await Update(projectId, project);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to update {newProject.Title}. Exception: {ex.Message}");
+        }
+    }
 
     public async Task UpdateTitle(Guid projectId, string newTitle)
     {
