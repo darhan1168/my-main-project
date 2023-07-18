@@ -15,6 +15,8 @@ public class UserService : GenericService<User>, IUserService
 {
     private readonly ISession _session;
 
+    public User User => GetUserFromSession();
+    
     public UserService(IRepository<User> repository, IHttpContextAccessor httpContextAccessor) :
         base(repository)
     {
@@ -134,5 +136,18 @@ public class UserService : GenericService<User>, IUserService
     public async Task<bool> IsValidPassword(string password)
     {
         return password.Length >= 6;
+    }
+    
+    private User GetUserFromSession()
+    {
+        var authenticatedUser = _session.GetString("AuthenticatedUser");
+
+        if (!string.IsNullOrEmpty(authenticatedUser))
+        {
+            var user = JsonConvert.DeserializeObject<User>(authenticatedUser);
+            return user;
+        }
+
+        return null; 
     }
 }

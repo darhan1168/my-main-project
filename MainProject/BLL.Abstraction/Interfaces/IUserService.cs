@@ -5,6 +5,7 @@ namespace BLL.Abstraction.Interfaces;
 
 public interface IUserService : IGenericService<User>
 {
+    User User { get; }
     Task Registration(User user);
 
     Task<User> Authorization(string username, string password);
