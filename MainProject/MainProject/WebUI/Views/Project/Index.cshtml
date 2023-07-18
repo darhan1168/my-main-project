@@ -1,0 +1,59 @@
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Core.Enums
+@model ProjectUserViewModel
+
+@if (Model.User == null)
+{
+    <p>Please log in or register to view projects.</p>
+    <p>
+        <a asp-area="" asp-controller="Account" asp-action="Login" class="btn btn-primary">Log in</a>
+        <a asp-area="" asp-controller="Account" asp-action="Register" class="btn btn-primary">Register</a>
+    </p>
+}
+else
+{
+    <h2>Project List</h2>
+
+    @if (Model.User.Role == UserRole.Stakeholder)
+    {
+        <p>
+            <a asp-action="Create" class="btn btn-primary">Create New Project</a>
+        </p>
+    }
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Completion Rate</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @if (Model.Projects.Count() == 0)
+        {
+            <tr>
+                <td colspan="5">No projects found.</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var project in Model.Projects)
+            {
+                <tr>
+                    <td>@project.Id</td>
+                    <td>@project.Title</td>
+                    <td>@project.Description</td>
+                    <td>@project.CompletionRate</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@project.Id">Edit</a> |
+                        <a asp-action="Delete" asp-route-id="@project.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        }
+        </tbody>
+    </table>
+}

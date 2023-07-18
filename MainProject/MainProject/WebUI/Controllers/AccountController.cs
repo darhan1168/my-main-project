@@ -105,7 +105,7 @@ public class AccountController : Controller
                 {
                     IsLogIn = true;
                     User = await _userService.GetUserByUsername(model.Username);
-                    return RedirectToAction("TaskMenu", "Task");
+                    return RedirectToAction("Index", "Project");
                 }
                 else
                 {
