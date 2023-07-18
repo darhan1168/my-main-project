@@ -2,10 +2,21 @@ using BLL;
 using BLL.Abstraction.Interfaces;
 using DAL;
 using DAL.Abstraction.Interfaces;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.Cookie.Name = "YourSessionCookieName";
+    options.IdleTimeout = TimeSpan.FromMinutes(20);
+    options.Cookie.IsEssential = true;
+});
+
+builder.Services.AddHttpContextAccessor(); 
 
 // Add services to the container.
 builder.Services.AddScoped<IUserService, UserService>();
@@ -37,6 +48,8 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.UseSession();
 
 app.MapControllerRoute(
     name: "default",

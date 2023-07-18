@@ -1,16 +1,24 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Security.Claims;
+using System.Text.RegularExpressions;
 using BLL.Abstraction.Interfaces;
 using Core;
 using DAL.Abstraction.Interfaces;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using Task = System.Threading.Tasks.Task;
 
 namespace BLL;
 
 public class UserService : GenericService<User>, IUserService
 {
-    public UserService(IRepository<User> repository) :
+    private readonly ISession _session;
+
+    public UserService(IRepository<User> repository, IHttpContextAccessor httpContextAccessor) :
         base(repository)
     {
+        _session = httpContextAccessor.HttpContext.Session;
     }
     
     public async Task Registration(User user)
@@ -62,6 +70,8 @@ public class UserService : GenericService<User>, IUserService
             {
                 throw new Exception("Incorrect password");
             }
+
+            _session.SetString("AuthenticatedUser", JsonConvert.SerializeObject(user));
 
             return user;
         }
