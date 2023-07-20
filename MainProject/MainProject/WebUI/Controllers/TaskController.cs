@@ -14,14 +14,16 @@ public class TaskController : Controller
 {
     private readonly IUserService _userService;
     private readonly ITaskService _taskService;
+    private readonly ITaskFileService _taskFileService;
     private readonly ISession _session;
 
     public User User => GetUserFromSession();
     
-    public TaskController(IUserService userService, ITaskService taskService, IHttpContextAccessor httpContextAccessor)
+    public TaskController(IUserService userService, ITaskService taskService, IHttpContextAccessor httpContextAccessor, ITaskFileService taskFileService)
     {
         _taskService = taskService;
         _userService = userService;
+        _taskFileService = taskFileService;
         _session = httpContextAccessor.HttpContext.Session;
     }
     
@@ -53,12 +55,33 @@ public class TaskController : Controller
             Deadline = model.Deadline,
             Files = new List<TaskFile>(),
             TaskPriority = model.TaskPriority,
-            TaskProgress = TaskProgress.NotStarted,
+            TaskProgress = TaskProgress.InProgress,
             Users = new List<User>()
         };
         
         await _taskService.CreateTask(task);
         
+        if (model.File != null && model.File.Length > 0)
+        {
+            var file = new TaskFile
+            {
+                FileName = model.File.FileName,
+                FileData = new byte[model.File.Length],
+                CreationDate = DateTime.Now
+            };
+            
+            using (var stream = new MemoryStream())
+            {
+                await model.File.CopyToAsync(stream);
+                file.FileData = stream.ToArray();
+            }
+            
+            await _taskFileService.CreateFile(file);
+            
+            task.Files.Add(file);
+            await _taskService.Update(task.Id, task);
+        }
+
         TempData["SuccessMessage"] = "Task has been created successfully.";
         
         //HttpContext.Session.SetString("SelectedTasks", JsonConvert.SerializeObject(task));
