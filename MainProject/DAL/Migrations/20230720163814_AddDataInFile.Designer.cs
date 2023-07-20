@@ -4,6 +4,7 @@ using DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(AppContext))]
-    partial class AppContextModelSnapshot : ModelSnapshot
+    [Migration("20230720163814_AddDataInFile")]
+    partial class AddDataInFile
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -97,9 +100,14 @@ namespace DAL.Migrations
                     b.Property<Guid?>("TaskId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("creator_id")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("TaskId");
+
+                    b.HasIndex("creator_id");
 
                     b.ToTable("Files");
                 });
@@ -165,6 +173,14 @@ namespace DAL.Migrations
                     b.HasOne("Core.Task", null)
                         .WithMany("Files")
                         .HasForeignKey("TaskId");
+
+                    b.HasOne("Core.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("creator_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("Core.User", b =>

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Core;
 using Core.Enums;
 
@@ -9,4 +10,5 @@ public class TaskViewModel
     public string Description { get; set; }
     public DateTime Deadline { get; set; }
     public TaskPriority TaskPriority { get; set; }
+    public IFormFile File { get; set; }
 }

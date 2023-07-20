@@ -4,10 +4,7 @@ namespace Core;
 
 public class TaskFile : BaseEntity
 {
-    public string FileName { get; set; } 
-    public string FilePath { get; set; } 
+    public string FileName { get; set; }
+    public byte[] FileData { get; set; }
     public DateTime CreationDate { get; set; }
-    
-    [ForeignKey("creator_id")]
-    public User CreatedBy { get; set; } 
 }
