@@ -154,6 +154,13 @@ public class ProjectService : GenericService<Project>, IProjectService
     {
         try
         {
+            var project = await GetById(projectId, "Tasks,UserProjects");
+            
+            if (project == null)
+            {
+                throw new Exception("Project not found");
+            }
+            
             await Delete(projectId);
         }
         catch (Exception ex)

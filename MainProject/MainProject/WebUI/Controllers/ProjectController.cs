@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using BLL.Abstraction.Interfaces;
 using Core;
 using Microsoft.AspNetCore.Mvc;
@@ -33,13 +34,13 @@ public class ProjectController : Controller
             
             return View(modelNull);
         }
-        
-        var projects = await _projectService.GetListByPredicate(p => p.UserProjects.
-            Any(up => up.UserId == _userService.User.Id));
+
+        var projects = await _projectService.GetList(p => p.UserProjects.Any(up => up.UserId == _userService.User.Id), 
+            null, "Tasks,UserProjects.User");
 
         var model = new ProjectUserViewModel()
         {
-            Projects = projects,
+            Projects = projects.ToList(),
             User = _userService.User
         };
         
@@ -131,3 +132,46 @@ public class ProjectController : Controller
         }
     }
     
+    public async Task<IActionResult> Edit(Guid id)
+    {
+        var project = await _projectService.GetById(id);
+        if (project == null)
+        {
+            return NotFound();
+        }
+        
+        return View(project);
+    }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(Guid id, Project project)
+    {
+        if (id != project.Id)
+        {
+            return NotFound();
+        }
+
+        await _projectService.UpdateAll(id, project);
+        return RedirectToAction(nameof(Index));
+    }
+    
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var project = await _projectService.GetById(id);
+        if (project == null)
+        {
+            return NotFound();
+        }
+        
+        return View(project);
+    }
+    
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(Guid id)
+    {
+        await _projectService.DeleteProject(id);
+        return RedirectToAction(nameof(Index));
+    }
+}
