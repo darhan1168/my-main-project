@@ -20,7 +20,6 @@ public class GenericService<T> : IGenericService<T> where T : BaseEntity
         try
         {
             await _repository.AddAsync(obj);
-            //await _unitOfWork.CommitAsync();
         }
         catch (Exception ex)
         {
@@ -33,7 +32,6 @@ public class GenericService<T> : IGenericService<T> where T : BaseEntity
         try
         {
             await _repository.DeleteAsync(id);
-            //await _unitOfWork.CommitAsync();
         }
         catch (Exception ex)
         {
@@ -50,6 +48,18 @@ public class GenericService<T> : IGenericService<T> where T : BaseEntity
         catch (Exception ex)
         {
             throw new Exception($"Failed to get {typeof(T).Name} by Id {id}. Exception: {ex.Message}");
+        }
+    }
+    
+    public async Task<T> GetById(Guid id, string includeProperties)
+    {
+        try
+        {
+            return await _repository.GetByIdAsync(id, includeProperties);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get {typeof(T).Name} by Id {id} and include properties {includeProperties}. Exception: {ex.Message}");
         }
     }
 
@@ -70,7 +80,6 @@ public class GenericService<T> : IGenericService<T> where T : BaseEntity
         try
         {
             await _repository.UpdateAsync(id, obj);
-            //await _unitOfWork.CommitAsync();
         }
         catch (Exception ex)
         {
@@ -83,6 +92,21 @@ public class GenericService<T> : IGenericService<T> where T : BaseEntity
         try
         {
             return await _repository.GetListByPredicateAsync(predicate);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get {typeof(T).Name} by predicate. Exception: {ex.Message}", ex);
+        }
+    }
+    
+    public async Task<IEnumerable<T>> GetList(
+        Expression<Func<T, bool>> filter = null,
+        Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+        string includeProperties = "")
+    {
+        try
+        {
+            return await _repository.GetListAsync(filter, orderBy, includeProperties);
         }
         catch (Exception ex)
         {

@@ -18,6 +18,34 @@ namespace DAL
             _dbSet = _dbContext.Set<T>();
         }
 
+        public virtual async Task<IEnumerable<T>> GetListAsync(
+            Expression<Func<T, bool>> filter = null,
+            Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+            string includeProperties = "")
+        {
+            IQueryable<T> query = _dbSet;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            foreach (var includeProperty in includeProperties.Split
+                         (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
+
+            if (orderBy != null)
+            {
+                return await orderBy(query).ToListAsync();
+            }
+            else
+            {
+                return await query.ToListAsync();
+            }
+        }
+        
         public async Task<T> GetByPredicateAsync(Expression<Func<T, bool>> predicate)
         {
             return await _dbSet.Where(predicate).FirstOrDefaultAsync();
@@ -33,13 +61,21 @@ namespace DAL
             await _dbSet.AddAsync(obj);
             await _dbContext.SaveChangesAsync();
         }
-
-        public async Task DeleteAsync(Guid id)
+        
+        public virtual async Task DeleteAsync(object id)
         {
-            var entity = await GetByIdAsync(id);
+            T entityToDelete = await _dbSet.FindAsync(id);
+            await Delete(entityToDelete);
+        }
+
+        public virtual async Task Delete(T entityToDelete)
+        {
+            if (_dbContext.Entry(entityToDelete).State == EntityState.Detached)
+            {
+                _dbSet.Attach(entityToDelete);
+            }
             
-            _dbSet.Remove(entity);
-            
+            _dbSet.Remove(entityToDelete);
             await _dbContext.SaveChangesAsync();
         }
 
@@ -52,14 +88,31 @@ namespace DAL
         {
             return await _dbSet.Where(e => e.Id.Equals(id)).FirstOrDefaultAsync();
         }
+        
+        public async Task<T> GetByIdAsync(Guid id, string includeProperties)
+        {
+            IQueryable<T> query = _dbSet;
+
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var includeProperty in includeProperties.Split
+                             (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeProperty);
+                }
+            }
+
+            return await query.FirstOrDefaultAsync(e => e.Id.Equals(id));
+        }
 
         public async Task UpdateAsync(Guid id, T updateObj)
         {
             var entity = await GetByIdAsync(id);
             entity = updateObj;
             
-            _dbSet.Update(entity);
-            
+            _dbSet.Attach(entity);
+            _dbContext.Entry(entity).State = EntityState.Modified;
+
             await _dbContext.SaveChangesAsync();
         }
     }

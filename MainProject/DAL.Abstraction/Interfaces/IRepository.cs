@@ -6,9 +6,16 @@ namespace DAL.Abstraction.Interfaces
 {
     public interface IRepository<T> where T : BaseEntity
     {
+        Task<IEnumerable<T>> GetListAsync(
+            Expression<Func<T, bool>> filter = null,
+            Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+            string includeProperties = "");
+        
         Task<List<T>> ListAsync(Expression<Func<T, bool>> expression);
         
         Task<T> GetByIdAsync(Guid id);
+
+        Task<T> GetByIdAsync(Guid id, string includeProperties);
 
         Task<T> GetByPredicateAsync(Expression<Func<T, bool>> predicate);
 
@@ -18,6 +25,6 @@ namespace DAL.Abstraction.Interfaces
 
         Task UpdateAsync(Guid id, T updateObj);
 
-        Task DeleteAsync(Guid id);
+        Task DeleteAsync(object id);
     }
 }
