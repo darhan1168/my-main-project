@@ -169,6 +169,13 @@ public class TaskService : GenericService<TaskProject>, ITaskService
     {
         try
         {
+            var task = await GetById(taskId, "Files");
+
+            if (task == null)
+            {
+                throw new Exception("Project not found");
+            }
+            
             await Delete(taskId);
         }
         catch (Exception ex)
