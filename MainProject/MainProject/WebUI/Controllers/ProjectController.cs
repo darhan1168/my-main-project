@@ -49,7 +49,7 @@ public class ProjectController : Controller
     
     public async Task<IActionResult> SelectUsers()
     {
-        var users = await _userService.GetListByPredicate(u => u.Username != null);
+        var users = await _userService.GetListByPredicate(u => u.Id != _userService.User.Id);
 
         return View(users);
     }
