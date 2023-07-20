@@ -26,19 +26,6 @@ public class TaskController : Controller
         _taskFileService = taskFileService;
         _session = httpContextAccessor.HttpContext.Session;
     }
-    
-    public async Task<ViewResult> TaskMenu()
-    {
-        var tasks = await _taskService.GetTasksByUserId(User.Id);
-
-        var viewModel = new TaskMenuViewModel
-        {
-            User = User,
-            Tasks = tasks
-        };
-        
-        return View(viewModel);
-    }
 
     public async Task<ViewResult> Create()
     {
