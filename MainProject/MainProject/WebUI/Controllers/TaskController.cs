@@ -35,115 +35,234 @@ public class TaskController : Controller
     [HttpPost]
     public async Task<ActionResult> Create(TaskViewModel model)
     {
-        var task = new TaskProject()
+        try
         {
-            Description = model.Description,
-            Title = model.Title,
-            Deadline = model.Deadline,
-            Files = new List<TaskFile>(),
-            TaskPriority = model.TaskPriority,
-            TaskProgress = TaskProgress.InProgress,
-            Users = new List<User>()
-        };
-        
-        await _taskService.CreateTask(task);
-        
-        if (model.File != null && model.File.Length > 0)
-        {
-            var file = new TaskFile
+            var task = new TaskProject()
             {
-                FileName = model.File.FileName,
-                FileData = new byte[model.File.Length],
-                CreationDate = DateTime.Now
+                Description = model.Description,
+                Title = model.Title,
+                Deadline = model.Deadline,
+                Files = new List<TaskFile>(),
+                TaskPriority = model.TaskPriority,
+                TaskProgress = TaskProgress.InProgress,
+                Users = new List<User>()
             };
-            
-            using (var stream = new MemoryStream())
+        
+            await _taskService.CreateTask(task);
+        
+            if (model.File != null && model.File.Length > 0)
             {
-                await model.File.CopyToAsync(stream);
-                file.FileData = stream.ToArray();
+                var file = new TaskFile
+                {
+                    FileName = model.File.FileName,
+                    FileData = new byte[model.File.Length],
+                    CreationDate = DateTime.Now
+                };
+            
+                using (var stream = new MemoryStream())
+                {
+                    await model.File.CopyToAsync(stream);
+                    file.FileData = stream.ToArray();
+                }
+            
+                await _taskFileService.CreateFile(file);
+            
+                task.Files.Add(file);
+                await _taskService.Update(task.Id, task);
             }
-            
-            await _taskFileService.CreateFile(file);
-            
-            task.Files.Add(file);
-            await _taskService.Update(task.Id, task);
+        
+            var tasksInSession = HttpContext.Session.GetString("SelectedTasks");
+            List<TaskProject> tasks;
+        
+            if (string.IsNullOrEmpty(tasksInSession))
+            {
+                tasks = new List<TaskProject>();
+            }
+            else
+            {
+                tasks = JsonConvert.DeserializeObject<List<TaskProject>>(tasksInSession);
+            }
+        
+            tasks.Add(task);
+            HttpContext.Session.SetString("SelectedTasks", JsonConvert.SerializeObject(tasks));
+        
+            return RedirectToAction("Create", "Project");
         }
-
-        TempData["SuccessMessage"] = "Task has been created successfully.";
-        
-        //HttpContext.Session.SetString("SelectedTasks", JsonConvert.SerializeObject(task));
-        var tasksInSession = HttpContext.Session.GetString("SelectedTasks");
-        List<TaskProject> tasks;
-        
-        if (string.IsNullOrEmpty(tasksInSession))
+        catch (Exception e)
         {
-            tasks = new List<TaskProject>();
+            ViewData["CreatingError"] = $"Failed to create task - {model.Title}. Error: {e.Message}";
+            return View(model);
         }
-        else
-        {
-            tasks = JsonConvert.DeserializeObject<List<TaskProject>>(tasksInSession);
-        }
-        
-        tasks.Add(task);
-        HttpContext.Session.SetString("SelectedTasks", JsonConvert.SerializeObject(tasks));
-        
-        return RedirectToAction("Create", "Project");
     }
 
     public async Task<ActionResult> Edit(Guid id)
     {
-        var task = await _taskService.GetById(id);
-        if (task == null)
+        try
         {
-            return NotFound();
-        }
+            var task = await _taskService.GetById(id);
+            if (task == null)
+            {
+                return NotFound();
+            }
 
-        return View(task);
+            return View(task);
+        }
+        catch (Exception e)
+        {
+            ViewData["EditingError"] = $"Failed to show editing task by {id}. Error: {e.Message}";
+            return View("Error");
+        }
     }
     
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> Edit(TaskProject task)
     {
-        await _taskService.UpdateAll(task.Id, task);
-        return RedirectToAction("Index", "Project");
+        try
+        {
+            await _taskService.UpdateAll(task.Id, task);
+            
+            return RedirectToAction("Index", "Project");
+        }
+        catch (Exception e)
+        {
+            ViewData["EditingError"] = $"Failed to edit task - {task.Title}. Error: {e.Message}";
+            return View(task);
+        }
     }
     
     public async Task<ActionResult> Delete(Guid id)
     {
-        var task = await _taskService.GetById(id);
-        if (task == null)
+        try
         {
-            return NotFound();
-        }
+            var task = await _taskService.GetById(id);
+            if (task == null)
+            {
+                return NotFound();
+            }
 
-        return View(task);
-    }
-    
-    public async Task<ActionResult> Delete(Guid id)
-    {
-        var task = await _taskService.GetById(id);
-        if (task == null)
+            return View(task);
+        }
+        catch (Exception e)
         {
-            return NotFound();
+            return View("Error");
         }
-
-        return View(task);
     }
     
     [HttpPost]
     public async Task<ActionResult> DeleteConfirmed(Guid id)
     {
-        await _taskService.DeleteTask(id);
-        return RedirectToAction("TaskMenu", "Task", new { username = User.Username });
+        try
+        {
+            await _taskService.DeleteTask(id);
+            
+            return RedirectToAction("Index", "Project");
+        }
+        catch (Exception e)
+        {
+            return View("Error");
+        }
+    }
+
+    public async Task<ActionResult> Check(Guid id)
+    {
+        try
+        {
+            var task = await _taskService.GetById(id);
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            return View(task);
+        }
+        catch (Exception e)
+        {
+            ViewData["CheckingError"] = $"Failed to check task. Error: {e.Message}";
+            return View("Error");
+        }
     }
     
-    // public async Task<ViewResult> FindUser()
-    // {
-    //     var users = await _userService.GetListByPredicate(u => u.Role == UserRole.Developer);
-    //     return View(users);
-    // }
     
+    [HttpPost]
+    public async Task<ActionResult> ChangeProgress(Guid id)
+    {
+        try
+        {
+            var task = await _taskService.GetById(id);
+            var user = _userService.User;
+        
+            if (task == null || user == null)
+            {
+                return NotFound();
+            }
+
+            if (task.TaskProgress == TaskProgress.InProgress)
+            {
+                if (user.Role == UserRole.Developer)
+                {
+                    await _taskService.TransitionNewStep(id);
+                }
+                else
+                {
+                    ViewData["MainError"] = "Sorry, but just developer can change progress now";
+                    return View("Check", task);
+                }
+            }
+            else if (task.TaskProgress == TaskProgress.Tested)
+            {
+                if (user.Role == UserRole.Tester)
+                {
+                    await _taskService.TransitionNewStep(id);
+                }
+                else
+                {
+                    ViewData["MainError"] = "Sorry, but just tester can change progress now";
+                    return View("Check", task);
+                }
+            }
+            else 
+            {
+                if (user.Role == UserRole.Stakeholder)
+                {
+                    await _taskService.TransitionNewStep(id);
+                }
+                else
+                {
+                    ViewData["MainError"] = "Sorry, but just stakeholder can change progress now";
+                    return View("Check", task);
+                }
+            }
+
+            return RedirectToAction("Index", "Project");
+        }
+        catch (Exception e)
+        {
+            ViewData["CreatingError"] = $"Failed to change progress. Error: {e.Message}";
+            return View("Error");
+        }
+    }
+    
+    public async Task<IActionResult> DownloadFile(Guid fileId)
+    {
+        try
+        {
+            var file = await _taskFileService.GetById(fileId);
+            if (file == null)
+            {
+                return NotFound();
+            }
+        
+            var contentType = "application/octet-stream"; 
+            return File(file.FileData, contentType, file.FileName);
+        }
+        catch (Exception e)
+        {
+            ViewData["CreatingError"] = $"Failed to download file. Error: {e.Message}";
+            return View("Error");
+        }
+    }
+
     private User GetUserFromSession()
     {
         var authenticatedUser = _session.GetString("AuthenticatedUser");
