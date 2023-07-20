@@ -1,0 +1,110 @@
+@using Core.Enums
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model ProjectDetailsViewModel
+
+<div class="container mt-5">
+    <h2>Project Details</h2>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="card-title">@Model.Project.Title</h3>
+            <p class="card-text">@Model.Project.Description</p>
+            <p class="card-text">Completion Rate: @Model.Project.CompletionRate</p>
+        </div>
+    </div>
+
+    <h3>Tasks</h3>
+    @if (Model.Project.Tasks.Count == 0)
+    {
+        <p>No tasks found.</p>
+    }
+    else
+    {
+        <ul class="list-group">
+            @foreach (var task in Model.Project.Tasks)
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>@task.Title - @task.Description</span>
+                    <div class="btn-group" role="group">
+                          @if (Model.User.Role == UserRole.Stakeholder)
+                          {
+                              <a asp-controller="Task" asp-action="Edit" asp-route-id="@task.Id" class="btn btn-primary btn-sm">Edit</a>
+                              <a asp-controller="Task" asp-action="Delete" asp-route-id="@task.Id" class="btn btn-danger btn-sm">Delete</a>
+                          }
+                          <a asp-controller="Task" asp-action="Check" asp-route-id="@task.Id" class="btn btn-success btn-sm">Check</a>
+                          
+                          @foreach (var file in task.Files)
+                          {
+                              <a asp-controller="Task" asp-action="DownloadFile" asp-route-fileId="@file.Id" class="btn btn-info btn-sm">Download @file.FileName</a>
+                          }                         
+                    </div>
+                </li>
+            }
+        </ul>
+    }
+
+    <h3>Users</h3>
+    @if (Model.Project.UserProjects.Count == 0)
+    {
+        <p>No users found.</p>
+    }
+    else
+    {
+        <ul class="list-group">
+            @foreach (var userProject in Model.Project.UserProjects)
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>@userProject.User.Username - @userProject.User.Email - @userProject.User.Role</span>
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+
+
+@* <h2>Project Details</h2> *@
+@* *@
+@* <div> *@
+@*     <h3>@Model.Title</h3> *@
+@*     <p>@Model.Description</p> *@
+@*     <p>Completion Rate: @Model.CompletionRate</p> *@
+@* </div> *@
+@* *@
+@* <h3>Tasks</h3> *@
+@* @if (Model.Tasks.Count == 0) *@
+@* { *@
+@*     <p>No tasks found.</p> *@
+@* } *@
+@* else *@
+@* { *@
+@*     <ul> *@
+@*         @foreach (var task in Model.Tasks) *@
+@*         { *@
+@*             <li> *@
+@*                 @task.Title - @task.Description *@
+@*                 <!-- Добавьте другую информацию о задаче, которую хотите отобразить --> *@
+@*                 <a asp-controller="Task" asp-action="Edit" asp-route-id="@task.Id">Edit</a> | *@
+@*                 <a asp-controller="Task" asp-action="Delete" asp-route-id="@task.Id">Delete</a> | *@
+@*                 <a asp-controller="Task" asp-action="Check" asp-route-id="@task.Id">Check</a> *@
+@*             </li> *@
+@*         } *@
+@*     </ul> *@
+@* } *@
+@* *@
+@* <h3>Users</h3> *@
+@* @if (Model.UserProjects.Count == 0) *@
+@* { *@
+@*     <p>No users found.</p> *@
+@* } *@
+@* else *@
+@* { *@
+@*     <ul> *@
+@*         @foreach (var userProject in Model.UserProjects) *@
+@*         { *@
+@*             <li> *@
+@*                 @userProject.User.Username - @userProject.User.Email *@
+@*             </li> *@
+@*         } *@
+@*     </ul> *@
+@* } *@

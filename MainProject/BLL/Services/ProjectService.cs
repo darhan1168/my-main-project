@@ -169,7 +169,7 @@ public class ProjectService : GenericService<Project>, IProjectService
         }
     }
 
-    public async Task<double> GetCompletionRate(Guid projectId)
+    public async Task UpdateCompletionRate(Guid projectId)
     {
         try
         {
@@ -191,8 +191,6 @@ public class ProjectService : GenericService<Project>, IProjectService
             
             project.CompletionRate = completionPercentage;
             await Update(projectId, project);
-            
-            return completionPercentage;
         }
         catch (Exception ex)
         {

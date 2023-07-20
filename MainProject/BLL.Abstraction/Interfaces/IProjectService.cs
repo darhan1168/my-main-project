@@ -19,7 +19,7 @@ public interface IProjectService : IGenericService<Project>
 
     Task DeleteProject(Guid projectId);
 
-    Task<double> GetCompletionRate(Guid projectId);
+    Task UpdateCompletionRate(Guid projectId);
 
     // Task AddUserProject(User user, Project project);
 }

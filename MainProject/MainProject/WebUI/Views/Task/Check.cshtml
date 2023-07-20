@@ -1,0 +1,41 @@
+@using Core.Enums
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model Core.Task
+
+<h2>Task Details</h2>
+
+<div>
+    <h3>@Model.Title</h3>
+    <p>@Model.Description</p>
+    <p>Deadline: @Model.Deadline</p>
+    <p>Task Priority: @Model.TaskPriority</p>
+    <p>Task Progress: @Model.TaskProgress</p>
+</div>
+
+<p>
+    @if (Model.TaskProgress == TaskProgress.InProgress)
+    {
+        @using (Html.BeginForm("ChangeProgress", "Task", new { id = Model.Id, progress = TaskProgress.Tested }, FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-primary">Mark as Tested</button>
+        }
+    }
+    else if (Model.TaskProgress == TaskProgress.Tested)
+    {
+        @using (Html.BeginForm("ChangeProgress", "Task", new { id = Model.Id, progress = TaskProgress.PendingApproval }, FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-primary">Mark as Pending Approval</button>
+        }
+    }
+    else if (Model.TaskProgress == TaskProgress.PendingApproval)
+    {
+        @using (Html.BeginForm("ChangeProgress", "Task", new { id = Model.Id, progress = TaskProgress.Completed }, FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-primary">Mark as Completed</button>
+        }
+    }
+    <span style="color: red;">@ViewData["MainError"]</span>
+</p>
