@@ -115,12 +115,19 @@ public class TaskController : Controller
     }
     
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<ActionResult> Edit(TaskProject task)
     {
-        if (ModelState.IsValid)
+        await _taskService.UpdateAll(task.Id, task);
+        return RedirectToAction("Index", "Project");
+    }
+    
+    public async Task<ActionResult> Delete(Guid id)
+    {
+        var task = await _taskService.GetById(id);
+        if (task == null)
         {
-            await _taskService.UpdateAll(task.Id, task);
-            return RedirectToAction("TaskMenu", "Task", new { username = User.Username });
+            return NotFound();
         }
 
         return View(task);
