@@ -38,8 +38,7 @@ public class TaskService : GenericService<TaskProject>, ITaskService
             {
                 throw new Exception("Task not found");
             }
-
-            task.TaskProgress = newTask.TaskProgress;
+            
             task.TaskPriority = newTask.TaskPriority;
             task.Title = newTask.Title;
             task.Deadline = newTask.Deadline;
