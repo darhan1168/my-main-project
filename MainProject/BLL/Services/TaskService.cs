@@ -202,7 +202,7 @@ public class TaskService : GenericService<TaskProject>, ITaskService
         {
             var user = await _userService.GetById(id);
             
-            return await GetListByPredicate(t => t.Users.Any(u => u.Username.Equals(user.Username)));
+            return await GetListByPredicate(t => t.Id.Equals(id));
         }
         catch (Exception ex)
         {

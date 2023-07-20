@@ -10,7 +10,7 @@ public class AppContext : DbContext
     public DbSet<Task> Tasks { get; set; }
     public DbSet<TaskFile> Files { get; set; }
     public DbSet<User> Users { get; set; }
-    public DbSet<UserProject> UserProjects { get; set; }
+    //public DbSet<UserProject> UserProjects { get; set; }
 
     public AppContext(DbContextOptions<AppContext> options)
         : base(options)

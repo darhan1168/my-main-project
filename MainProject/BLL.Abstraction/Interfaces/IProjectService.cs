@@ -21,5 +21,5 @@ public interface IProjectService : IGenericService<Project>
 
     Task<double> GetCompletionRate(Guid projectId);
 
-    Task AddUserProject(User user, Project project);
+    // Task AddUserProject(User user, Project project);
 }

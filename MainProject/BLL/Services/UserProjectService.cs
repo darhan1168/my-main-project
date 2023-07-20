@@ -12,16 +12,8 @@ public class UserProjectService : GenericService<UserProject>, IUserProjectServi
     {
     }
 
-    public async Task CreateUserProject(User user, Project project)
+    public async Task CreateUserProject(UserProject userProject)
     {
-        var userProject = new UserProject()
-        {
-            User = user,
-            UserId = user.Id,
-            Project = project,
-            ProjectId = project.Id
-        };
-        
         await Add(userProject);
     }
 }
