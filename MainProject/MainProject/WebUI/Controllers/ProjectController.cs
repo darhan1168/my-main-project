@@ -38,6 +38,8 @@ public class ProjectController : Controller
         var projects = await _projectService.GetList(p => p.UserProjects.Any(up => up.UserId == _userService.User.Id), 
             null, "Tasks,UserProjects.User");
 
+        await UpdateRate(projects.ToList());
+        
         var model = new ProjectUserViewModel()
         {
             Projects = projects.ToList(),
