@@ -176,4 +176,30 @@ public class ProjectController : Controller
         await _projectService.DeleteProject(id);
         return RedirectToAction(nameof(Index));
     }
+    
+    public async Task<IActionResult> Details(Guid id)
+    {
+        var project = await _projectService.GetById(id, "Tasks.Files,UserProjects.User");
+
+        if (project == null)
+        {
+            return NotFound();
+        }
+
+        var projectDetailsViewModel = new ProjectDetailsViewModel
+        {
+            Project = project,
+            User = _userService.User
+        };
+        
+        return View(projectDetailsViewModel);
+    }
+
+    private async Task UpdateRate(List<Project> projects)
+    {
+        foreach (var project in projects)
+        {
+            await _projectService.UpdateCompletionRate(project.Id);
+        }
+    }
 }
