@@ -420,6 +420,26 @@ public class ProjectController : Controller
             return View("Error");
         }
     }
+    
+    public async Task<IActionResult> DeleteUser(Guid projectId, Guid userProjectId)
+    {
+        try
+        {
+            var project = await _projectService.GetById(projectId, "UserProjects.User");
+            var userProject = await _userProjectService.GetById(userProjectId);
+
+            project.UserProjects.Remove(userProject);
+            
+            await _projectService.Update(project.Id, project);
+            
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception e)
+        {
+            ViewData["IndexError"] = $"Failed to show details. Error: {e.Message}";
+            return View("Error");
+        }
+    }
 
     private async Task UpdateRate(List<Project> projects)
     {
