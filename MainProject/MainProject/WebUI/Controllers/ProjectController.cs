@@ -107,7 +107,65 @@ public class ProjectController : Controller
         
         return RedirectToAction("Index", "Project");
     }
+
+    public async Task<IActionResult> SelectNewTask(Guid id)
+    {
+        var project = await _projectService.GetById(id,"Tasks.Files");
+        if (project == null)
+        {
+            return NotFound();
+        }
+
+        ViewBag.ProjectId = project.Id; 
+        
+        return View();
+    }
     
+    [HttpPost]
+    public async Task<IActionResult> AddNewTaskToProject(TaskViewModel model, Guid projectId)
+    {
+        var project = await _projectService.GetById(projectId,"Tasks.Files");
+        
+        var task = new TaskProject()
+        {
+            Description = model.Description,
+            Title = model.Title,
+            Deadline = model.Deadline,
+            Files = new List<TaskFile>(),
+            TaskPriority = model.TaskPriority,
+            TaskProgress = TaskProgress.InProgress,
+            Users = new List<User>()
+        };
+        
+        await _taskService.CreateTask(task);
+        
+        if (model.File != null && model.File.Length > 0)
+        {
+            var file = new TaskFile
+            {
+                FileName = model.File.FileName,
+                FileData = new byte[model.File.Length],
+                CreationDate = DateTime.Now
+            };
+            
+            using (var stream = new MemoryStream())
+            {
+                await model.File.CopyToAsync(stream);
+                file.FileData = stream.ToArray();
+            }
+            
+            await _taskFileService.CreateFile(file);
+            
+            task.Files.Add(file);
+            await _taskService.Update(task.Id, task);
+        }
+        
+        project.Tasks.Add(task);
+        await _projectService.Update(project.Id, project);
+        
+        return RedirectToAction("Index", "Project");
+    }
+
     public IActionResult Create()
     {
         return View();
