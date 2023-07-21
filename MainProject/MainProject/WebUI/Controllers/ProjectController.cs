@@ -43,24 +43,25 @@ public class ProjectController : Controller
                 return View(modelNull);
             }
         
-            // if (TempData.TryGetValue("CurrentProject", out var projectData))
-            // {
-            //     var task = await _taskService.GetById(taskId);
-            //     
-            //     var projectDetailsViewModel = JsonConvert.DeserializeObject<ProjectDetailsViewModel>(projectData.ToString());
-            //     TempData.Remove("CurrentProject");
-            //     
-            //     if (task != null && task.Description != null)
-            //     {
-            //         await _projectService.SentEmail(projectDetailsViewModel.Project.Id, task.Id);
-            //     }
-            // }
+            if (TempData.TryGetValue("CurrentProject", out var projectData))
+            {
+                var task = await _taskService.GetById(taskId);
+                
+                var projectDetailsViewModel = JsonConvert.DeserializeObject<ProjectDetailsViewModel>(projectData.ToString());
+                TempData.Remove("CurrentProject");
+                
+                if (task != null && task.Description != null)
+                {
+                    await _projectService.SentEmail(projectDetailsViewModel.Project.Id, task.Id, $"Your task - {task.Title} was changed");
+                }
+            }
 
             var projects = await _projectService.GetList(p => p.UserProjects.Any(up => up.UserId == _userService.User.Id), 
                 null, "Tasks.Files,UserProjects.User");
 
             await UpdateRate(projects.ToList());
-        
+            await _projectService.CheckDeadline(projects.ToList());
+            
             var model = new ProjectUserViewModel()
             {
                 Projects = projects.OrderBy(p => p.CompletionRate).ToList(),
