@@ -154,14 +154,19 @@ public class ProjectService : GenericService<Project>, IProjectService
     {
         try
         {
-            var project = await GetById(projectId, "Tasks,UserProjects");
+            var project = await GetById(projectId, "Tasks.Files,UserProjects");
             
             if (project == null)
             {
                 throw new Exception("Project not found");
             }
-            
+
             await Delete(projectId);
+            
+            foreach (var task in project.Tasks)
+            {
+                await _taskService.DeleteTask(task.Id);
+            }
         }
         catch (Exception ex)
         {
@@ -174,6 +179,13 @@ public class ProjectService : GenericService<Project>, IProjectService
         try
         {
             var project = await GetById(projectId);
+
+            if (project.Tasks.Count == 0)
+            {
+                project.CompletionRate = 0;
+                await Update(projectId, project);
+                return;
+            }
             
             List<TaskProject> tasks = new List<TaskProject>();
             foreach (var task in project.Tasks)
