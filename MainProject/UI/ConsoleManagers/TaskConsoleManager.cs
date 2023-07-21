@@ -396,9 +396,7 @@ public class TaskConsoleManager : ConsoleManager<ITaskService, TaskProject>, ICo
                 var file = new TaskFile()
                 {
                     Id = Guid.NewGuid(),
-                    FilePath = path,
                     FileName = name,
-                    CreatedBy = _user,
                     CreationDate = DateTime.Today
                 };
 

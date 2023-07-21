@@ -73,9 +73,9 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
             foreach (var project in projects)
             {
                 Console.WriteLine("-----");
-                var completionRate = _service.GetCompletionRate(project.Id);
-                Console.WriteLine($"{index} Project - Title: {project.Title}, Description: {project.Description}, Completion rate: {completionRate} %");
-                
+                // var completionRate = _service.GetCompletionRate(project.Id);
+                // Console.WriteLine($"{index} Project - Title: {project.Title}, Description: {project.Description}, Completion rate: {completionRate} %");
+                //
                 Console.WriteLine("Tasks:");
                 DisplayAllTask(project);
                 
@@ -114,7 +114,7 @@ public class ProjectConsoleManager : ConsoleManager<IProjectService, Project>, I
             };
 
             await _service.CreateProject(project);
-            await _service.AddUserProject(user.FirstOrDefault(), project);
+            // await _service(user.FirstOrDefault(), project);
             Console.WriteLine("Your project successfully added");
         }
         catch (Exception ex)
