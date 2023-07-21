@@ -2,6 +2,7 @@ using System.Security.Claims;
 using BLL.Abstraction.Interfaces;
 using Core;
 using Core.Enums;
+using Core.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using WebUI.Models;
@@ -19,7 +20,8 @@ public class TaskController : Controller
 
     public User User => GetUserFromSession();
     
-    public TaskController(IUserService userService, ITaskService taskService, IHttpContextAccessor httpContextAccessor, ITaskFileService taskFileService)
+    public TaskController(IUserService userService, ITaskService taskService, IHttpContextAccessor httpContextAccessor, 
+        ITaskFileService taskFileService)
     {
         _taskService = taskService;
         _userService = userService;
@@ -127,8 +129,8 @@ public class TaskController : Controller
         try
         {
             await _taskService.UpdateAll(task.Id, task);
-            
-            return RedirectToAction("Index", "Project");
+
+            return RedirectToAction("Index", "Project",  new { id = task.Id, taskId = task.Id });
         }
         catch (Exception e)
         {
@@ -189,7 +191,6 @@ public class TaskController : Controller
         }
     }
     
-    
     [HttpPost]
     public async Task<ActionResult> ChangeProgress(Guid id)
     {
@@ -211,7 +212,7 @@ public class TaskController : Controller
                 }
                 else
                 {
-                    ViewData["MainError"] = "Sorry, but just developer can change progress now";
+                    ViewData["CheckingError"] = "Sorry, but just developer can change progress now";
                     return View("Check", task);
                 }
             }
@@ -223,7 +224,7 @@ public class TaskController : Controller
                 }
                 else
                 {
-                    ViewData["MainError"] = "Sorry, but just tester can change progress now";
+                    ViewData["CheckingError"] = "Sorry, but just tester can change progress now";
                     return View("Check", task);
                 }
             }
@@ -235,7 +236,7 @@ public class TaskController : Controller
                 }
                 else
                 {
-                    ViewData["MainError"] = "Sorry, but just stakeholder can change progress now";
+                    ViewData["CheckingError"] = "Sorry, but just stakeholder can change progress now";
                     return View("Check", task);
                 }
             }
@@ -244,7 +245,7 @@ public class TaskController : Controller
         }
         catch (Exception e)
         {
-            ViewData["CreatingError"] = $"Failed to change progress. Error: {e.Message}";
+            ViewData["CheckingError"] = $"Failed to change progress. Error: {e.Message}";
             return View("Error");
         }
     }
