@@ -1,0 +1,18 @@
+@model Core.Task
+
+<h2>Delete Task</h2>
+
+<div>
+    <h4>Are you sure you want to delete this task?</h4>
+    <h5>Title: @Model.Title</h5>
+    <h5>Description: @Model.Description</h5>
+    <h5>Deadline: @Model.Deadline</h5>
+    <h5>Priority: @Model.TaskPriority</h5>
+    <h5>Progress: @Model.TaskProgress</h5>
+</div>
+
+@using (Html.BeginForm("DeleteConfirmed", "Task", new { id = Model.Id }, FormMethod.Post))
+{
+    <input type="submit" value="Delete" class="btn btn-danger" />
+    <a href="@Url.Action("Details", "Project", new { id = ViewBag.ProjectId })" class="btn btn-secondary">Cancel</a>
+}
