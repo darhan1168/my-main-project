@@ -18,7 +18,7 @@ body {
 }
 
 .task-priority-low {
-  background-color: lightgreen;
+  background-color: #aff08c;
 }
 
 .task-priority-normal {
@@ -26,13 +26,13 @@ body {
 }
 
 .task-priority-high {
-  background-color: orange;
+  background-color: #ee9c7a;
 }
 
 .task-priority-urgent {
-  background-color: orangered;
+  background-color: #e16d45;
 }
 
 .task-priority-critical {
-  background-color: red;
+  background-color: #c04c40;
 }
