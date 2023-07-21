@@ -61,6 +61,11 @@
             {
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     <span>@userProject.User.Username - @userProject.User.Email - @userProject.User.Role</span>
+                    @if (Model.User.Role == UserRole.Stakeholder && userProject.UserId != Model.User.Id)
+                    {
+                        <a asp-controller="Project" asp-action="DeleteUser" asp-route-projectId="@Model.Project.Id" asp-route-userProjectId="@userProject.Id"
+                           class="btn btn-danger btn-sm">Delete</a>
+                    }
                 </li>
             }
         </ul>
