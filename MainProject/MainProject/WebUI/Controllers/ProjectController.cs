@@ -63,7 +63,7 @@ public class ProjectController : Controller
         
             var model = new ProjectUserViewModel()
             {
-                Projects = projects.ToList(),
+                Projects = projects.OrderBy(p => p.CompletionRate).ToList(),
                 User = _userService.User
             };
         
