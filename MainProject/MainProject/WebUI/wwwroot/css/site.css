@@ -16,3 +16,23 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.task-priority-low {
+  background-color: lightgreen;
+}
+
+.task-priority-normal {
+  background-color: #f0e68c;
+}
+
+.task-priority-high {
+  background-color: orange;
+}
+
+.task-priority-urgent {
+  background-color: orangered;
+}
+
+.task-priority-critical {
+  background-color: red;
+}
