@@ -21,3 +21,7 @@
     <button type="submit" class="btn btn-primary">Create</button>
     <a asp-action="Index" class="btn btn-secondary">Back to List</a> 
 }
+@if (!string.IsNullOrEmpty(ViewData["CreationError"] as string))
+{
+    <span style="color: red;">@ViewData["CreationError"]</span>
+} 

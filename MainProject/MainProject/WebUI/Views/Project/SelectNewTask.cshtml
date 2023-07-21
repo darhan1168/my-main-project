@@ -40,3 +40,7 @@
         <span style="color: red;">@ViewData["CreatingError"]</span>
     }                                            
 }
+@if (!string.IsNullOrEmpty(ViewData["SelectError"] as string))
+{
+    <span style="color: red;">@ViewData["SelectError"]</span>
+} 

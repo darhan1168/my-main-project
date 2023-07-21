@@ -1,9 +1,9 @@
 @using Core.Enums
 @model TaskViewModel
 
-<h2>Create Task</h2>
+<h2>Add task in your project</h2>
 
-@using (Html.BeginForm("Create", "Task", FormMethod.Post, new { @action = Url.Action("Create", "Task") }))
+@using (Html.BeginForm("Create", "Task", FormMethod.Post, new { @action = Url.Action("Create", "Task"), enctype = "multipart/form-data" }))
 {
     <div class="form-group">
         @Html.LabelFor(m => m.Title)
@@ -14,10 +14,10 @@
         @Html.LabelFor(m => m.Description)
         @Html.TextAreaFor(m => m.Description, new { @class = "form-control" })
     </div>
-
+    
     <div class="form-group">
         @Html.LabelFor(m => m.Deadline)
-        @Html.TextBoxFor(m => m.Deadline, new { @class = "form-control", type = "datetime" })
+        @Html.TextBoxFor(m => m.Deadline, new { @class = "form-control", type = "datetime-local" })
     </div>
 
     <div class="form-group">
@@ -29,5 +29,15 @@
         }), new { @class = "form-control" })
     </div>
     
+     <div class="form-group">
+            @Html.LabelFor(m => m.File)
+            @Html.TextBoxFor(m => m.File, new { @class = "form-control", type = "file" })
+     </div>
+    
     <button type="submit" class="btn btn-primary">Create</button>
+                                                 
+    @if (!string.IsNullOrEmpty(ViewData["CreatingError"] as string))
+    {
+        <span style="color: red;">@ViewData["CreatingError"]</span>
+    }                                            
 }

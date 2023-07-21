@@ -82,14 +82,22 @@ else
                         }
                     </td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@project.Id">Edit</a> |
-                        <a asp-action="Delete" asp-route-id="@project.Id">Delete</a>
+                        @if (Model.User.Role == UserRole.Stakeholder)
+                        {
+                            <a asp-action="Edit" asp-route-id="@project.Id">Edit</a> 
+                            <a asp-action="Delete" asp-route-id="@project.Id">Delete</a>                                                             
+                        }
+                        <a asp-action="Details" asp-route-id="@project.Id">Details</a>
                     </td>
                 </tr>
             }
         }
         </tbody>
     </table>
+    @if (!string.IsNullOrEmpty(ViewData["IndexError"] as string))
+    {
+        <span style="color: red;">@ViewData["IndexError"]</span>
+    } 
     @* <table class="table"> *@
     @*     <thead> *@
     @*     <tr> *@

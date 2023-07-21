@@ -42,6 +42,7 @@
             }
         </ul>
     }
+    <a asp-action="SelectNewTask" asp-route-id="@Model.Project.Id" class="btn btn-primary">Select New Task</a>
     
     <h3>Users</h3>
     @if (Model.Project.UserProjects.Count == 0)

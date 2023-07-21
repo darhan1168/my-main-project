@@ -30,3 +30,7 @@
 
     <button type="submit" class="btn btn-primary">Add Selected Users</button>
 }
+@if (!string.IsNullOrEmpty(ViewData["SelectError"] as string))
+{
+    <span style="color: red;">@ViewData["SelectError"]</span>
+} 
