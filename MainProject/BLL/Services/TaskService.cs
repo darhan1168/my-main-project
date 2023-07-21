@@ -10,11 +10,13 @@ namespace BLL;
 public class TaskService : GenericService<TaskProject>, ITaskService
 {
     private readonly IUserService _userService;
-
-    public TaskService(IRepository<TaskProject> repository, IUserService userService) :
+    private readonly ITaskFileService _taskFileService;
+    
+    public TaskService(IRepository<TaskProject> repository, IUserService userService, ITaskFileService taskFileService) :
         base(repository)
     {
         _userService = userService;
+        _taskFileService = taskFileService;
     }
     
     public async Task CreateTask(TaskProject task)
@@ -175,8 +177,13 @@ public class TaskService : GenericService<TaskProject>, ITaskService
             {
                 throw new Exception("Project not found");
             }
-            
+
             await Delete(taskId);
+            
+            foreach (var file in task.Files)
+            {
+                await _taskFileService.Delete(file.Id);
+            }
         }
         catch (Exception ex)
         {
