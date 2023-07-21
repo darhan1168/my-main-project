@@ -5,6 +5,10 @@
 @using (Html.BeginForm("Create", "Project", FormMethod.Post))
 {
     <div class="form-group">
+        <a href="@Url.Action("Create", "Task")" class="btn btn-primary">Add one more task</a>
+    </div>
+    
+    <div class="form-group">
         @Html.LabelFor(m => m.Title)
         @Html.TextBoxFor(m => m.Title, new { @class = "form-control" })
     </div>
@@ -13,13 +17,8 @@
         @Html.LabelFor(m => m.Description)
         @Html.TextAreaFor(m => m.Description, new { @class = "form-control" })
     </div>
-    
-    <div class="form-group">
-        <a href="@Url.Action("Create", "Task")" class="btn btn-primary">Add Tasks</a>
-    </div>
 
     <button type="submit" class="btn btn-primary">Create</button>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a> 
 }
 @if (!string.IsNullOrEmpty(ViewData["CreationError"] as string))
 {
