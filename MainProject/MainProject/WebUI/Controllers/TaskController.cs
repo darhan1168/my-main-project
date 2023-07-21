@@ -37,6 +37,12 @@ public class TaskController : Controller
     {
         try
         {
+            if (string.IsNullOrWhiteSpace(model.Description) || string.IsNullOrWhiteSpace(model.Title))
+            {
+                ViewData["FieldError"] = "Please all fields must be completed";
+                return View(model);
+            }
+            
             var task = new TaskProject()
             {
                 Description = model.Description,

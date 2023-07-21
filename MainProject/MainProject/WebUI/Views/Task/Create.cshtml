@@ -33,7 +33,14 @@
             @Html.LabelFor(m => m.File)
             @Html.TextBoxFor(m => m.File, new { @class = "form-control", type = "file" })
      </div>
-    
+     
+    <div>
+        @if (!string.IsNullOrEmpty(ViewData["FieldError"] as string))
+        {
+            <span style="color: red;">@ViewData["FieldError"]</span>
+        } 
+    </div>
+     
     <button type="submit" class="btn btn-primary">Create</button>
                                                  
     @if (!string.IsNullOrEmpty(ViewData["CreatingError"] as string))
