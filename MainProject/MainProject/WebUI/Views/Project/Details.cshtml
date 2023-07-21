@@ -42,7 +42,7 @@
             }
         </ul>
     }
-
+    
     <h3>Users</h3>
     @if (Model.Project.UserProjects.Count == 0)
     {
@@ -59,6 +59,7 @@
             }
         </ul>
     }
+    <a asp-action="SelectNewUsers" asp-route-id="@Model.Project.Id" class="btn btn-primary">Select New Users</a>
 </div>
 
 

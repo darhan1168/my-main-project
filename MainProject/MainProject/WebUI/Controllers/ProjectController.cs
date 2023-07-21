@@ -13,13 +13,15 @@ public class ProjectController : Controller
 {
     private readonly IProjectService _projectService;
     private readonly IUserService _userService;
+    private readonly ITaskService _taskService;
     private readonly IUserProjectService _userProjectService;
 
     public ProjectController(IProjectService projectService, IUserService userService,
-        IUserProjectService userProjectService)
+        IUserProjectService userProjectService, ITaskService taskService)
     {
         _projectService = projectService;
         _userService = userService;
+        _taskService = taskService;
         _userProjectService = userProjectService;
     }
     
@@ -64,6 +66,46 @@ public class ProjectController : Controller
         HttpContext.Session.SetString("SelectedUsers", JsonConvert.SerializeObject(users));
         
         return RedirectToAction("Create", "Task");
+    }
+    
+    public async Task<IActionResult> SelectNewUsers(Guid id)
+    {
+        var project = await _projectService.GetById(id,"UserProjects.User");
+        if (project == null)
+        {
+            return NotFound();
+        }
+        
+        var allUsers = await _userService.GetListByPredicate(u => u.Id != _userService.User.Id);
+        var newUsers = allUsers.Where(u => !project.UserProjects.Any(up => up.UserId == u.Id)).ToList();
+
+        ViewBag.ProjectId = project.Id; 
+        
+        return View(newUsers);
+    }
+    
+    [HttpPost]
+    public async Task<IActionResult> AddNewUsersToProject(List<Guid> selectedUsers, Guid projectId)
+    {
+        var project = await _projectService.GetById(projectId, "UserProjects.User");
+        var users = await _userService.GetListByPredicate(u => selectedUsers.Contains(u.Id));
+        
+        foreach (var user in users)
+        {
+            var userProject = new UserProject()
+            {
+                User = user,
+                UserId = user.Id,
+                Project = project,
+                ProjectId = project.Id
+            };
+            
+            project.UserProjects.Add(userProject);
+        }
+        
+        await _projectService.Update(project.Id, project);
+        
+        return RedirectToAction("Index", "Project");
     }
     
     public IActionResult Create()
