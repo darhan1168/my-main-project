@@ -198,6 +198,43 @@ public class ProjectService : GenericService<Project>, IProjectService
         }
     }
 
+    public async Task SentEmail(Guid projectId, Guid taskId, string massage)
+    {
+        var project = await GetById(projectId,"Tasks.Files,UserProjects.User");
+        var task = await _taskService.GetById(taskId);
+        
+        if (project.Tasks.Count == 0)
+        {
+            return;
+        }
+
+        var emailService = new EmailService();
+        
+        foreach (var userProject in project.UserProjects)
+        {
+            var recipientEmail = $"{userProject.User.Email}";
+            var subject = $"Your task {task.Title}";
+            var body = massage;
+            await emailService.SendEmailAsync(recipientEmail, subject, body);
+        }
+    }
+
+    public async Task CheckDeadline(List<Project> projects)
+    {
+        DateTime today = DateTime.Today; 
+    
+        foreach (var project in projects)
+        {
+            foreach (var task in project.Tasks)
+            {
+                if (task.Deadline <= today)
+                {
+                    await SentEmail(project.Id, task.Id, $"Your deadline {task.Deadline} finished");
+                }
+            }
+        }
+    }
+
     // public async Task AddUserProject(User user, Project project)
     // {
     //     await _userProjectService.CreateUserProject(user, project);

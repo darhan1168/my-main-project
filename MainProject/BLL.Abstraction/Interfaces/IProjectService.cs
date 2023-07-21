@@ -20,6 +20,10 @@ public interface IProjectService : IGenericService<Project>
     Task DeleteProject(Guid projectId);
 
     Task UpdateCompletionRate(Guid projectId);
+    
+    Task SentEmail(Guid projectId, Guid taskId, string massage);
+
+    Task CheckDeadline(List<Project> projects);
 
     // Task AddUserProject(User user, Project project);
 }
