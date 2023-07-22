@@ -26,6 +26,11 @@ public class ProjectService : GenericService<Project>, IProjectService
     {
         try
         {
+            if (string.IsNullOrEmpty(project.Title) || string.IsNullOrEmpty(project.Description))
+            {
+                throw new Exception("Project title and description cannot be empty.");
+            }
+            
             await Add(project);
         }
         catch (Exception ex)
