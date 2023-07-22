@@ -12,6 +12,7 @@
 }
 else
 {
+    <h1>Hello, @Model.User.Username</h1>
     <h2>Project List</h2>
 
     @if (Model.User.Role == UserRole.Stakeholder)
@@ -21,114 +22,83 @@ else
         </p>
     }
 
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Completion Rate</th>
-            <th>Users</th>
-            <th>Tasks</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        @if (Model.Projects.Count() == 0)
-        {
-            <tr>
-                <td colspan="6">No projects found.</td>
-            </tr>
-        }
-        else
-        {
-            @foreach (var project in Model.Projects)
-            {
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
                 <tr>
-                    <td>@project.Title</td>
-                    <td>@project.Description</td>
-                    <td>@project.CompletionRate</td>
-                    <td>
-                        @if (project.UserProjects != null && project.UserProjects.Count > 0)
-                        {
-                            @foreach (var userProject in project.UserProjects)
-                            {
-                                <span>@userProject.User.Username</span>
-                                @if (!userProject.Equals(project.UserProjects.Last()))
-                                {
-                                    <span>, </span>
-                                }
-                            }
-                        }
-                        else
-                        {
-                            <span>No users assigned</span>
-                        }
-                    </td>
-                    <td>
-                        @if (project.Tasks != null && project.Tasks.Count > 0)
-                        {
-                            @foreach (var task in project.Tasks)
-                            {
-                                <span>@task.Title</span>
-                                @if (!task.Equals(project.Tasks.Last()))
-                                {
-                                    <span>, </span>
-                                }
-                            }
-                        }
-                        else
-                        {
-                            <span>No tasks</span>
-                        }
-                    </td>
-                    <td>
-                        @if (Model.User.Role == UserRole.Stakeholder)
-                        {
-                            <a asp-action="Edit" asp-route-id="@project.Id">Edit</a> 
-                            <a asp-action="Delete" asp-route-id="@project.Id">Delete</a>                                                             
-                        }
-                        <a asp-action="Details" asp-route-id="@project.Id">Details</a>
-                    </td>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Completion Rate</th>
+                    <th>Users</th>
+                    <th>Tasks</th>
+                    <th></th>
                 </tr>
-            }
-        }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @if (Model.Projects.Count() == 0)
+                {
+                    <tr>
+                        <td colspan="6">No projects found.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var project in Model.Projects)
+                    {
+                        <tr>
+                            <td>@project.Title</td>
+                            <td style="word-wrap: break-word; white-space: pre-wrap;">@project.Description</td>
+                            <td>@project.CompletionRate</td>
+                            <td>
+                                @if (project.UserProjects != null && project.UserProjects.Count > 0)
+                                {
+                                    @foreach (var userProject in project.UserProjects)
+                                    {
+                                        <span>@userProject.User.Username</span>
+                                        @if (!userProject.Equals(project.UserProjects.Last()))
+                                        {
+                                            <span>, </span>
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    <span>No users assigned</span>
+                                }
+                            </td>
+                            <td>
+                                @if (project.Tasks != null && project.Tasks.Count > 0)
+                                {
+                                    @foreach (var task in project.Tasks)
+                                    {
+                                        <span>@task.Title</span>
+                                        @if (!task.Equals(project.Tasks.Last()))
+                                        {
+                                            <span>, </span>
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    <span>No tasks</span>
+                                }
+                            </td>
+                            <td>
+                                @if (Model.User.Role == UserRole.Stakeholder)
+                                {
+                                    <a asp-action="Edit" asp-route-id="@project.Id" class="btn btn-primary">Edit</a>
+                                    <a asp-action="Delete" asp-route-id="@project.Id" class="btn btn-danger">Delete</a>
+                                }
+                                <a asp-action="Details" asp-route-id="@project.Id" class="btn btn-info">Details</a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
     @if (!string.IsNullOrEmpty(ViewData["IndexError"] as string))
     {
         <span style="color: red;">@ViewData["IndexError"]</span>
-    } 
-    @* <table class="table"> *@
-    @*     <thead> *@
-    @*     <tr> *@
-    @*         <th>Title</th> *@
-    @*         <th>Description</th> *@
-    @*         <th>Completion Rate</th> *@
-    @*         <th></th> *@
-    @*     </tr> *@
-    @*     </thead> *@
-    @*     <tbody> *@
-    @*     @if (Model.Projects.Count() == 0) *@
-    @*     { *@
-    @*         <tr> *@
-    @*             <td colspan="5">No projects found.</td> *@
-    @*         </tr> *@
-    @*     } *@
-    @*     else *@
-    @*     { *@
-    @*         @foreach (var project in Model.Projects) *@
-    @*         { *@
-    @*             <tr> *@
-    @*                 <td>@project.Title</td> *@
-    @*                 <td>@project.Description</td> *@
-    @*                 <td>@project.CompletionRate</td> *@
-    @*                 <td> *@
-    @*                     <a asp-action="Edit" asp-route-id="@project.Id">Edit</a> | *@
-    @*                     <a asp-action="Delete" asp-route-id="@project.Id">Delete</a> *@
-    @*                 </td> *@
-    @*             </tr> *@
-    @*         } *@
-    @*     } *@
-    @*     </tbody> *@
-    @* </table> *@
+    }
 }
