@@ -21,27 +21,27 @@
     else
     {
         <ul class="list-group">
-            @foreach (var task in Model.Project.Tasks.OrderBy(t => t.TaskPriority))
+            @foreach (var task in Model.Project.Tasks.OrderByDescending(t => t.TaskPriority))
             {
-                <li class="list-group-item d-flex justify-content-between align-items-center 
-            @($"task-priority-{task.TaskPriority.ToString().ToLower()}")">
-                    <span>@task.Title - @task.Description</span>
+                <li class="list-group-item d-flex justify-content-between align-items-center @($"task-priority-{task.TaskPriority.ToString().ToLower()}")">
+                    @if (task.TaskProgress == TaskProgress.Completed)
+                    {
+                        <span class="text-success">&#x2714; </span>
+                    }
+                    <div class="overflow-auto">
+                        <span>@task.Title - @task.Description - @task.Deadline</span>
+                    </div>
                     <div class="btn-group" role="group">
                         @if (Model.User.Role == UserRole.Stakeholder)
                         {
-                            <a asp-controller="Task" asp-action="Edit" asp-route-id="@task.Id" 
-                               class="btn btn-primary btn-sm">Edit</a>
-                            <a asp-controller="Task" asp-action="Delete" asp-route-id="@task.Id" 
-                               class="btn btn-danger btn-sm">Delete</a>
+                            <a asp-controller="Task" asp-action="Edit" asp-route-id="@task.Id" class="btn btn-primary btn-sm">Edit</a>
+                            <a asp-controller="Task" asp-action="Delete" asp-route-id="@task.Id" class="btn btn-danger btn-sm">Delete</a>
                         }
-                        <a asp-controller="Task" asp-action="Check" asp-route-id="@task.Id" 
-                           class="btn btn-success btn-sm">Check</a>
-                  
+                        <a asp-controller="Task" asp-action="Check" asp-route-id="@task.Id" class="btn btn-success btn-sm">Check</a>
                         @foreach (var file in task.Files)
                         {
-                            <a asp-controller="Task" asp-action="DownloadFile" asp-route-fileId="@file.Id" 
-                               class="btn btn-info btn-sm">Download @file.FileName</a>
-                        }                         
+                            <a asp-controller="Task" asp-action="DownloadFile" asp-route-fileId="@file.Id" class="btn btn-info btn-sm">Download @file.FileName</a>
+                        }
                     </div>
                 </li>
             }
