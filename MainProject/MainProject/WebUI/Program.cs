@@ -31,6 +31,10 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<DAL.AppContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 60000000;
 });
 
 var app = builder.Build();
