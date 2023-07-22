@@ -224,6 +224,11 @@ public class ProjectService : GenericService<Project>, IProjectService
         
         foreach (var userProject in project.UserProjects)
         {
+            if (!_userService.IsValidEmail(userProject.User.Email))
+            {
+                return;
+            }
+            
             var recipientEmail = $"{userProject.User.Email}";
             var subject = $"Your task {task.Title}";
             var body = massage;
