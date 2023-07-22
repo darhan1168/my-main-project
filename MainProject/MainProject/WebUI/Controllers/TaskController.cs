@@ -60,20 +60,7 @@ public class TaskController : Controller
         
             if (model.File != null && model.File.Length > 0)
             {
-                var file = new TaskFile
-                {
-                    FileName = model.File.FileName,
-                    FileData = new byte[model.File.Length],
-                    CreationDate = DateTime.Now
-                };
-            
-                using (var stream = new MemoryStream())
-                {
-                    await model.File.CopyToAsync(stream);
-                    file.FileData = stream.ToArray();
-                }
-            
-                await _taskFileService.CreateFile(file);
+                var file = await _taskFileService.CreateFile(model.File);
             
                 task.Files.Add(file);
                 await _taskService.Update(task.Id, task);

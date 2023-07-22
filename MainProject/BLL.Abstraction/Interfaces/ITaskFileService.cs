@@ -1,9 +1,10 @@
 using Core;
+using Microsoft.AspNetCore.Http;
 using Task = System.Threading.Tasks.Task;
 
 namespace BLL.Abstraction.Interfaces;
 
 public interface ITaskFileService : IGenericService<TaskFile>
 {
-    Task CreateFile(TaskFile file);
+    Task<TaskFile> CreateFile(IFormFile modelFile);
 }
