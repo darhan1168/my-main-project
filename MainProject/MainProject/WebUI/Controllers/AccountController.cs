@@ -11,7 +11,6 @@ public class AccountController : Controller
 {
     private readonly IUserService _userService;
     public bool IsLogIn { get; set; }
-    
     public User User { get; set; }
     public AccountController(IUserService userService)
     {
