@@ -11,9 +11,4 @@ public class UserProjectService : GenericService<UserProject>, IUserProjectServi
         : base(repository)
     {
     }
-
-    public async Task CreateUserProject(UserProject userProject)
-    {
-        await Add(userProject);
-    }
 }

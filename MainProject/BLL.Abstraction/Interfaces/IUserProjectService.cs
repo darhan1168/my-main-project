@@ -5,5 +5,4 @@ namespace BLL.Abstraction.Interfaces;
 
 public interface IUserProjectService :  IGenericService<UserProject>
 {
-    Task CreateUserProject(UserProject userProject);
 }
