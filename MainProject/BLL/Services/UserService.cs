@@ -133,6 +133,11 @@ public class UserService : GenericService<User>, IUserService
         return regex.IsMatch(email);
     }
     
+    public async Task<bool> IsEmailAvailable(string email)
+    {
+        return (await GetListByPredicate(u => u.Email == email)).ToList().Count == 0;
+    }
+    
     public async Task<bool> IsValidPassword(string password)
     {
         return password.Length >= 6;

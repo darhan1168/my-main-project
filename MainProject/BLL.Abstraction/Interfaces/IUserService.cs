@@ -19,4 +19,6 @@ public interface IUserService : IGenericService<User>
     bool IsValidEmail(string email);
 
     Task<bool> IsValidPassword(string password);
+
+    Task<bool> IsEmailAvailable(string email);
 }
