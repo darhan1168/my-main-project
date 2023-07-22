@@ -34,7 +34,7 @@
         @using (Html.BeginForm("ChangeProgress", "Task", new { id = Model.Id, progress = TaskProgress.Completed }, FormMethod.Post))
         {
             @Html.AntiForgeryToken()
-            <button type="submit" class="btn btn-primary">Mark as Completed</button>
+            <button type="submit" class="btn btn-primary button-with-margin">Mark as Completed</button>
         }
     }
     

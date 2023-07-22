@@ -47,9 +47,9 @@
             }
         </ul>
     }
-    <a asp-action="SelectNewTask" asp-route-id="@Model.Project.Id" class="btn btn-primary">Select New Task</a>
+    <a asp-action="SelectNewTask" asp-route-id="@Model.Project.Id" class="btn btn-primary button-with-margin">Select New Task</a>
     
-    <h3>Users</h3>
+    <h3 class="button-with-margin">Users</h3>
     @if (Model.Project.UserProjects.Count == 0)
     {
         <p>No users found.</p>
@@ -70,7 +70,7 @@
             }
         </ul>
     }
-    <a asp-action="SelectNewUsers" asp-route-id="@Model.Project.Id" class="btn btn-primary">Select New Users</a>
+    <a asp-action="SelectNewUsers" asp-route-id="@Model.Project.Id" class="btn btn-primary button-with-margin">Select New Users</a>
 </div>
 
 

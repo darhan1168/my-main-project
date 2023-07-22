@@ -36,3 +36,7 @@ body {
 .task-priority-critical {
   background-color: #c04c40;
 }
+
+.button-with-margin {
+  margin-top: 10px;
+}
