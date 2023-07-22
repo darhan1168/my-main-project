@@ -16,17 +16,12 @@ public class TaskController : Controller
     private readonly IUserService _userService;
     private readonly ITaskService _taskService;
     private readonly ITaskFileService _taskFileService;
-    private readonly ISession _session;
 
-    public User User => GetUserFromSession();
-    
-    public TaskController(IUserService userService, ITaskService taskService, IHttpContextAccessor httpContextAccessor, 
-        ITaskFileService taskFileService)
+    public TaskController(IUserService userService, ITaskService taskService, ITaskFileService taskFileService)
     {
         _taskService = taskService;
         _userService = userService;
         _taskFileService = taskFileService;
-        _session = httpContextAccessor.HttpContext.Session;
     }
 
     public async Task<ViewResult> Create()
@@ -242,19 +237,6 @@ public class TaskController : Controller
             ViewData["CreatingError"] = $"Failed to download file. Error: {e.Message}";
             return View("Error");
         }
-    }
-
-    private User GetUserFromSession()
-    {
-        var authenticatedUser = _session.GetString("AuthenticatedUser");
-
-        if (!string.IsNullOrEmpty(authenticatedUser))
-        {
-            var user = JsonConvert.DeserializeObject<User>(authenticatedUser);
-            return user;
-        }
-
-        return null; 
     }
 
     private void AddTaskInSession(TaskProject task)
