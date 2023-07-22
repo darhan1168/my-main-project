@@ -24,6 +24,4 @@ public interface IProjectService : IGenericService<Project>
     Task SentEmail(Guid projectId, Guid taskId, string massage);
 
     Task CheckDeadline(List<Project> projects);
-
-    // Task AddUserProject(User user, Project project);
 }

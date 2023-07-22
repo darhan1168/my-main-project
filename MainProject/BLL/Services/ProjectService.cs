@@ -253,9 +253,4 @@ public class ProjectService : GenericService<Project>, IProjectService
             }
         }
     }
-
-    // public async Task AddUserProject(User user, Project project)
-    // {
-    //     await _userProjectService.CreateUserProject(user, project);
-    // }
 }
