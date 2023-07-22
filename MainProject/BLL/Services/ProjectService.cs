@@ -201,6 +201,8 @@ public class ProjectService : GenericService<Project>, IProjectService
             int totalTasksCount = tasks.Count;
             double completionPercentage = (completedTasksCount / (double)totalTasksCount) * 100;
             
+            completionPercentage = Math.Round(completionPercentage, 2);
+
             project.CompletionRate = completionPercentage;
             await Update(projectId, project);
         }
