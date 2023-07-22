@@ -47,11 +47,11 @@
                             Value = r.ToString()
                         }), new { @class = "form-control custom-select" })
                     </div>
+                    <button type="submit" class="btn btn-primary button-with-margin">Register</button>
                     @if (!string.IsNullOrEmpty(ViewData["GeneralError"] as string))
                     {
-                         <span style="color: red;">@ViewData["GeneralError"]</span>
+                        <span style="color: red;">@ViewData["GeneralError"]</span>
                     }
-                    <button type="submit" class="btn btn-primary button-with-margin">Register</button>
                 }
             </div>
         </div>
