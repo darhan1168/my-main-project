@@ -126,7 +126,7 @@ public class UserService : GenericService<User>, IUserService
         }
     }
     
-    public async Task<bool> IsValidEmail(string email)
+    public bool IsValidEmail(string email)
     {
         string pattern = @"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$";
         Regex regex = new Regex(pattern);

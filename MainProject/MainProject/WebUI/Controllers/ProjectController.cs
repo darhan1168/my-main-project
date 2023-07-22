@@ -82,8 +82,9 @@ public class ProjectController : Controller
         try
         {
             var users = await _userService.GetListByPredicate(u => u.Id != _userService.User.Id);
-
-            return View(users);
+            var usersWithValidEmail = users.Where(u => _userService.IsValidEmail(u.Email)).ToList();
+            
+            return View(usersWithValidEmail);
         }
         catch (Exception e)
         {
@@ -121,10 +122,11 @@ public class ProjectController : Controller
         
             var allUsers = await _userService.GetListByPredicate(u => u.Id != _userService.User.Id);
             var newUsers = allUsers.Where(u => !project.UserProjects.Any(up => up.UserId == u.Id)).ToList();
+            var usersWithValidEmail = newUsers.Where(u => _userService.IsValidEmail(u.Email)).ToList();
 
             ViewBag.ProjectId = project.Id; 
         
-            return View(newUsers);
+            return View(usersWithValidEmail);
         }
         catch (Exception e)
         {

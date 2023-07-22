@@ -49,7 +49,7 @@ public class AccountController : Controller
                 hasErrors = true;
             }
 
-            if (!await _userService.IsValidEmail(model.Email))
+            if (!_userService.IsValidEmail(model.Email))
             {
                 ViewData["EmailError"] = "This email is not correct";
                 hasErrors = true;
