@@ -23,6 +23,16 @@ public class TaskService : GenericService<TaskProject>, ITaskService
     {
         try
         {
+            if (string.IsNullOrEmpty(task.Title) || string.IsNullOrEmpty(task.Description))
+            {
+                throw new Exception("Task title and description cannot be empty.");
+            }
+            
+            if (task.Deadline < DateTime.Now)
+            {
+                throw new Exception("Task deadline cannot be in the past.");
+            }
+            
             await Add(task);
         }
         catch (Exception ex)
@@ -45,6 +55,7 @@ public class TaskService : GenericService<TaskProject>, ITaskService
             task.Title = newTask.Title;
             task.Deadline = newTask.Deadline;
             task.Description = task.Description;
+            
             await Update(taskId, task);
         }
         catch (Exception ex)
