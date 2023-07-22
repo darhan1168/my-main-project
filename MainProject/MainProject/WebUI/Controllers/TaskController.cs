@@ -65,21 +65,8 @@ public class TaskController : Controller
                 task.Files.Add(file);
                 await _taskService.Update(task.Id, task);
             }
-        
-            var tasksInSession = HttpContext.Session.GetString("SelectedTasks");
-            List<TaskProject> tasks;
-        
-            if (string.IsNullOrEmpty(tasksInSession))
-            {
-                tasks = new List<TaskProject>();
-            }
-            else
-            {
-                tasks = JsonConvert.DeserializeObject<List<TaskProject>>(tasksInSession);
-            }
-        
-            tasks.Add(task);
-            HttpContext.Session.SetString("SelectedTasks", JsonConvert.SerializeObject(tasks));
+
+            AddTaskInSession(task);
         
             return RedirectToAction("Create", "Project");
         }
@@ -268,5 +255,23 @@ public class TaskController : Controller
         }
 
         return null; 
+    }
+
+    private void AddTaskInSession(TaskProject task)
+    {
+        var tasksInSession = HttpContext.Session.GetString("SelectedTasks");
+        List<TaskProject> tasks;
+        
+        if (string.IsNullOrEmpty(tasksInSession))
+        {
+            tasks = new List<TaskProject>();
+        }
+        else
+        {
+            tasks = JsonConvert.DeserializeObject<List<TaskProject>>(tasksInSession);
+        }
+        
+        tasks.Add(task);
+        HttpContext.Session.SetString("SelectedTasks", JsonConvert.SerializeObject(tasks));
     }
 }
