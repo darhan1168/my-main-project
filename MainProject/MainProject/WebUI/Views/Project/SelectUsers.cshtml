@@ -1,0 +1,37 @@
+@model List<Core.User>
+
+<h2>Select Users</h2>
+
+@using (Html.BeginForm("AddUsersToProject", "Project", FormMethod.Post))
+{
+    <div class="form-group">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Select</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>@user.Username</td>
+                        <td>@user.Email</td>
+                        <td>@user.Role</td>
+                        <td>
+                            <input type="checkbox" name="selectedUsers" value="@user.Id" />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <button type="submit" class="btn btn-primary button-with-margin">Add Selected Users</button>
+}
+@if (!string.IsNullOrEmpty(ViewData["SelectError"] as string))
+{
+    <span style="color: red;">@ViewData["SelectError"]</span>
+} 

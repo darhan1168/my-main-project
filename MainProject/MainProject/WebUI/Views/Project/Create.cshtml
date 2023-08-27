@@ -1,0 +1,26 @@
+@model ProjectViewModel
+
+<h2>Create Project</h2>
+
+@using (Html.BeginForm("Create", "Project", FormMethod.Post))
+{
+    <div class="form-group">
+        <a href="@Url.Action("Create", "Task")" class="btn btn-primary">Add one more task</a>
+    </div>
+    
+    <div class="form-group">
+        @Html.LabelFor(m => m.Title)
+        @Html.TextBoxFor(m => m.Title, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Description)
+        @Html.TextAreaFor(m => m.Description, new { @class = "form-control" })
+    </div>
+
+    <button type="submit" class="btn btn-primary button-with-margin">Create</button>
+}
+@if (!string.IsNullOrEmpty(ViewData["CreationError"] as string))
+{
+    <span style="color: red;">@ViewData["CreationError"]</span>
+} 

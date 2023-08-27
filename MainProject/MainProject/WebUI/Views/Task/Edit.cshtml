@@ -1,0 +1,41 @@
+@using Core.Enums
+@model Core.Task
+
+<h2>Edit Task</h2>
+
+@using (Html.BeginForm("Edit", "Task", FormMethod.Post))
+{
+    @Html.HiddenFor(m => m.Id) 
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Title)
+        @Html.TextBoxFor(m => m.Title, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Description)
+        @Html.TextAreaFor(m => m.Description, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+            @Html.LabelFor(m => m.Deadline)
+            @Html.TextBoxFor(m => m.Deadline, new { @class = "form-control", type = "datetime-local", min = DateTime.Now.ToString("yyyy-MM-ddTHH:mm"), required = "required" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.TaskPriority)
+        @Html.DropDownListFor(m => m.TaskPriority, Enum.GetValues(typeof(TaskPriority)).Cast<TaskPriority>().Select(r => new SelectListItem
+        {
+            Text = r.ToString(),
+            Value = r.ToString()
+        }), new { @class = "form-control" })
+    </div>
+    
+    <button type="submit" class="btn btn-primary button-with-margin">Save</button>
+    <a asp-controller="Project" asp-action="Index" class="btn btn-secondary button-with-margin">Back to List</a>
+    
+    @if (!string.IsNullOrEmpty(ViewData["EditingError"] as string))
+    {
+        <span style="color: red;">@ViewData["EditingError"]</span>
+    } 
+}

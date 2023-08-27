@@ -1,0 +1,74 @@
+@using Core.Enums
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model ProjectDetailsViewModel
+
+<div class="container mt-5">
+    <h2>Project Details</h2>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="card-title">@Model.Project.Title</h3>
+            <p class="card-text">@Model.Project.Description</p>
+            <p class="card-text">Completion Rate: @Model.Project.CompletionRate</p>
+        </div>
+    </div>
+
+    <h3>Tasks</h3>
+    @if (Model.Project.Tasks.Count == 0)
+    {
+        <p>No tasks found.</p>
+    }
+    else
+    {
+        <ul class="list-group">
+            @foreach (var task in Model.Project.Tasks.OrderByDescending(t => t.TaskPriority))
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-center @($"task-priority-{task.TaskPriority.ToString().ToLower()}")">
+                    @if (task.TaskProgress == TaskProgress.Completed)
+                    {
+                        <span class="text-success">&#x2714; </span>
+                    }
+                    <div class="overflow-auto">
+                        <span>@task.Title - @task.Description - @task.Deadline</span>
+                    </div>
+                    <div class="btn-group" role="group">
+                        @if (Model.User.Role == UserRole.Stakeholder)
+                        {
+                            <a asp-controller="Task" asp-action="Edit" asp-route-id="@task.Id" class="btn btn-primary btn-sm">Edit</a>
+                            <a asp-controller="Task" asp-action="Delete" asp-route-id="@task.Id" class="btn btn-danger btn-sm">Delete</a>
+                        }
+                        <a asp-controller="Task" asp-action="Check" asp-route-id="@task.Id" class="btn btn-success btn-sm">Check</a>
+                        @foreach (var file in task.Files)
+                        {
+                            <a asp-controller="Task" asp-action="DownloadFile" asp-route-fileId="@file.Id" class="btn btn-info btn-sm">Download @file.FileName</a>
+                        }
+                    </div>
+                </li>
+            }
+        </ul>
+    }
+    <a asp-action="SelectNewTask" asp-route-id="@Model.Project.Id" class="btn btn-primary button-with-margin">Select New Task</a>
+    
+    <h3 class="button-with-margin">Users</h3>
+    @if (Model.Project.UserProjects.Count == 0)
+    {
+        <p>No users found.</p>
+    }
+    else
+    {
+        <ul class="list-group">
+            @foreach (var userProject in Model.Project.UserProjects)
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>@userProject.User.Username - @userProject.User.Email - @userProject.User.Role</span>
+                    @if (Model.User.Role == UserRole.Stakeholder && userProject.UserId != Model.User.Id)
+                    {
+                        <a asp-controller="Project" asp-action="DeleteUser" asp-route-projectId="@Model.Project.Id" asp-route-userProjectId="@userProject.Id"
+                           class="btn btn-danger btn-sm">Delete</a>
+                    }
+                </li>
+            }
+        </ul>
+    }
+    <a asp-action="SelectNewUsers" asp-route-id="@Model.Project.Id" class="btn btn-primary button-with-margin">Select New Users</a>
+</div>

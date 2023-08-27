@@ -1,0 +1,42 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.task-priority-low {
+  background-color: #aff08c;
+}
+
+.task-priority-normal {
+  background-color: #f0e68c;
+}
+
+.task-priority-high {
+  background-color: #ee9c7a;
+}
+
+.task-priority-urgent {
+  background-color: #e16d45;
+}
+
+.task-priority-critical {
+  background-color: #c04c40;
+}
+
+.button-with-margin {
+  margin-top: 10px;
+}
